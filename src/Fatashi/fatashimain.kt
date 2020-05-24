@@ -12,10 +12,41 @@ const val KAMUSI_FILE = WORK_FILE
 
 fun main() {
     println("\n$APP_NAME starting...")
-    val dictionary = Dictionary(KAMUSI_FILE,FIELD_DELIMITERS)
-
-    dictionary.printStatus()
-//    dictionary.listAll()
-
+    Fatashi.work()
     println("...ending $APP_NAME")
+}
+
+object Fatashi  {
+        // instantiate dictionary
+    private val dictionary = Dictionary(KAMUSI_FILE,FIELD_DELIMITERS)
+
+    init {
+        // show that dictionary is viable & ready
+        dictionary.printStatus()
+    }
+
+    // fatashi work loops through commands
+    // arg: environment (future)
+
+    fun work(  ) {
+        var cmd: String
+        var loop = true
+
+        do {
+            print("$APP_NAME > ")  // command prompt
+            cmd = readLine() ?: "exit"   // accept a command
+
+                // parse command
+            when (cmd) {
+                "exit"      -> loop = false   // exit program
+                "quit"      -> loop = false  // exit program
+                "tafuta"    -> dictionary.findByEntry( cmd )  // search dictionary
+                "list"      -> dictionary.listAll()   // list dictionary
+                "sts"       -> dictionary.printStatus()   // dict status
+                "help"      -> println("tafuta, list, sts, help, quit, exit")
+                else        -> println("$cmd is unrecognizable; try again!")
+            }
+
+        } while ( loop )
+    }
 }

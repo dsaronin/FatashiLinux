@@ -25,7 +25,7 @@ const val ANCHOR_TAIL = '$'     // pattern anchor for tail of FIELD_USG
 //   _internal_fields: String = "\t",  // internal field delimiter defaults to tab
 //   _record_delimiter: String  = "\n"    // dict record delimiter defaults to newline
 class Dictionary(
-        _kamusi_file: String,  // filename for raw dictionary
+        _kamusi_file: String,  // file object for raw dictionary
         _field_delimiters: String,  // regex pattern to find main fields
         _internal_fields: String = "\t",  // internal field delimiter
         _record_delimiter: String = "\n"    // dict record delimiter
@@ -78,7 +78,7 @@ class Dictionary(
     // returns:
     //   list of matching strings; null if none
     fun findByEntry(pattern: String): List<String>? {
-        println("Pattern: " + pattern )
+        println("Pattern: >|$pattern|<" )
         return null
     }
 
