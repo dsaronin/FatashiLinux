@@ -25,3 +25,32 @@ hs_err_pid*
 # data
 dsa_dictionary.txt
 *~
+
+# Android built artifacts
+*.apk
+*.ap_
+*.dex
+
+# other generated files
+bin/
+gen/
+build/
+
+# local configuration file (for Android sdk path, etc)
+local.properties
+
+# OSX files
+.DS_Store
+
+# Eclipse project files
+.classpath
+.project
+
+# Android Studio
+*.iml
+.idea
+.gradle
+
+
+#NDK
+obj/

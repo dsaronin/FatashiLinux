@@ -24,7 +24,7 @@ const val ANCHOR_TAIL = '$'     // pattern anchor for tail of FIELD_USG
 //   _field_delimiters: String,  // regex pattern to find main fields
 //   _internal_fields: String = "\t",  // internal field delimiter defaults to tab
 //   _record_delimiter: String  = "\n"    // dict record delimiter defaults to newline
-class Dictionary(
+class Kamusi(
         _kamusi_file: String,  // file object for raw dictionary
         _field_delimiters: String,  // regex pattern to find main fields
         _internal_fields: String = "\t",  // internal field delimiter
