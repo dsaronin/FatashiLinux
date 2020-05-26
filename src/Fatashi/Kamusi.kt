@@ -3,21 +3,6 @@ package Fatashi
 import java.io.File
 
 
-// patterns for wrapping a search string to constrain it to a given dictionary field
-// KEY and USAGE fields, coming at head or tail, each have two parts;
-// the KEY_HEAD might not be required if the search pattern begins with "^", to anchor at BOL
-// the USG_TAIL might not be required if the search pattern ends with "$", to anchor at EOL
-// for consistancy, FIELD_DEF also has HEAD and TAIL
-
-const val FIELD_KEY_HEAD = "^.*"  // item KEY is first field before TAB
-const val FIELD_KEY_TAIL = ".*\t"  // item KEY is first field before TAB
-const val FIELD_DEF_HEAD = "^.*\t.*"  // item DEFINITION is second field between two tabs
-const val FIELD_DEF_TAIL = ".*\t"  // item DEFINITION is second field between two tabs
-const val FIELD_USG_HEAD = "^.*\t.*\t.*"  // item USAGE is third field, prior to EOL
-const val FIELD_USG_TAIL = ".*$"  // item USAGE is third field, prior to EOL
-const val ANCHOR_HEAD = '^'     // pattern anchor for head of FIELD_KEY
-const val ANCHOR_TAIL = '$'     // pattern anchor for tail of FIELD_USG
-
 // Dictionary handles everything re dictionary database, but has no language-specific logic
 // properties required:
 //   _kamusi_file: String,  // filename for raw dictionary

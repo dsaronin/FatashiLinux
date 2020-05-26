@@ -1,40 +1,16 @@
 // Fatashi -- a dictionary search & display package
 package Fatashi
 
-import java.io.FileInputStream
-import java.util.Properties
-
-
-// global parameters
-const val APP_NAME = "fatashi"
-const val WORK_FILE = "data/tempdict.txt"
-const val PRODUCTION_FILE = "data/dsa_dictionary.txt"
-const val FIELD_DELIMITERS = "(\\s+--\\s+)|(\t__[ \t\\x0B\\f]+)"
-const val KAMUSI_FILE = WORK_FILE
-
-const val CONFIG_PROPERTIES="config.properties"
-
+// kotlin conventional starting point
 fun main(args: Array<String>) {
-    val appProperties = initMain( Properties() )
+    MyEnvironment.setup(args)   // initialize app environment
 
     println("\n$APP_NAME starting...")
-    Fatashi.work()
+    FatashiWork.work()
     println("...ending $APP_NAME")
 }
 
-private fun initMain(appProps: Properties): Properties {
-        // load the properties file
-    appProps.load( FileInputStream(CONFIG_PROPERTIES) )
-
-    println("config keys: ")
-    for ( key in appProps.propertyNames() ) {
-        println("$key: >|${appProps[key]}|<")
-    }
-
-    return appProps
-}
-
-object Fatashi  {
+object FatashiWork  {
         // instantiate kamusi
     private val kamusi = Kamusi(KAMUSI_FILE, FIELD_DELIMITERS)
 
