@@ -80,4 +80,4 @@ EOM
 
 # echo "filepath is: $filepath"
 
-# git add $filepath
+git add $filepath
