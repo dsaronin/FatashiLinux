@@ -26,7 +26,10 @@ hs_err_pid*
 
 # data
 dsa_dictionary.txt
+
+# vim
 *~
+.swp
 
 # Android built artifacts
 *.apk
