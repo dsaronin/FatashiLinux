@@ -44,7 +44,8 @@ object MyEnvironment {
     // setup -- intializes the environment
     // args -- are the cli argument list when invoked
     fun setup(args: Array<String>): Unit {
-        listProperties()
+//        listProperties()
+//        listArgList(args)
         parseArgList(args)
     }
 
@@ -62,7 +63,33 @@ object MyEnvironment {
         }
     }
 
+    fun listArgList(args: Array<String>) {
+        println( if( args.isEmpty() ) "No args passed." else "My calling args are...")
+        for (i in args.indices ) println("args[$i] is: ${args[i]}")
+    }
     fun parseArgList(args: Array<String>) {
+        if( args.isEmpty() ) return
+
+        var lifo = Stack<String>()
+
+        // build stack in reverse (right-to-left) from args for top-down parsing
+        for( i in args.indices..0 ) {
+            lifo.push( args[i] )
+        }
+
+        val flag_regex = Regex("""-(\w\b|-\w+)""")
+        // now parse stack (left-to-right)
+        while( !lifo.isEmpty() ) {
+            var flag = lifo.pop()
+
+            val matches = rex.findAll( sflag )
+            val m=mtch1.firstOrNull()
+            if (m != null) {
+                val flag = if( m.groupValues[1].isEmpty() ) m.groupValues[2] else m.groupValues[1]
+                println("value: ${m.value}; group: $flag")
+            }
+            else println("no match")
+        }
     }
 
 }
