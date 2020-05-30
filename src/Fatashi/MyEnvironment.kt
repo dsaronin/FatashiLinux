@@ -36,12 +36,19 @@ object MyEnvironment {
 
     private val appProps = Properties()
 
+    var listLineCount = _LIST_LINE_COUNT
+    var verboseFlag = false
+    var debugFlag = false
+    var kamusiMainFile = KAMUSI_FILE
+    var kamusiStdFile = KAMUSI_STANDARD_FILE
+    var methaliStdFile = METHALI_STANDARD_FILE
+
     // load the properties file
     init {
         appProps.load( FileInputStream(CONFIG_PROPERTIES) )
     }
 
-    // setup -- intializes the environment
+    // setup -- initializes the environment
     // args -- are the cli argument list when invoked
     fun setup(args: Array<String>): Unit {
 //        listProperties()
@@ -67,29 +74,67 @@ object MyEnvironment {
         println( if( args.isEmpty() ) "No args passed." else "My calling args are...")
         for (i in args.indices ) println("args[$i] is: ${args[i]}")
     }
+
+    // ex: -v -n 5 -d --version --kamusi1 "dsa_dictionary.txt" --kamusi2 "tuki_kamusi.txt" --methali "methali_kamusi.txt"
+
     fun parseArgList(args: Array<String>) {
         if( args.isEmpty() ) return
 
         var lifo = Stack<String>()
 
         // build stack in reverse (right-to-left) from args for top-down parsing
-        for( i in args.indices..0 ) {
-            lifo.push( args[i] )
-        }
+        for( i in args.indices.reversed() ) lifo.push( args[i] )
 
+        // regex recognizer for short/long flags and extracts the flag w/o punctuation
         val flag_regex = Regex("""-(\w\b|-\w+)""")
+
         // now parse stack (left-to-right)
         while( !lifo.isEmpty() ) {
-            var flag = lifo.pop()
+            var flagArg = lifo.pop()
 
-            val matches = rex.findAll( sflag )
-            val m=mtch1.firstOrNull()
-            if (m != null) {
-                val flag = if( m.groupValues[1].isEmpty() ) m.groupValues[2] else m.groupValues[1]
-                println("value: ${m.value}; group: $flag")
+            val matches = flag_regex.findAll( flagArg )  // recognize & extract
+            val m=matches.firstOrNull()
+            if (m == null) {
+                printArgUsageError(args, "invalid flag syntax: $flagArg")
             }
-            else println("no match")
+            else {
+                // extract the flag (it will be in either of the two groupings, but not both
+                val flag = if( !m.groupValues[1].isEmpty() ) m.groupValues[1] else m.groupValues[2]
+
+                // flag is now the extracted flag
+                println("extracted flag is: $flag")
+                when (flag) {
+                    "n"             -> listLineCount = popValueOrDefault(lifo,_LIST_LINE_COUNT)
+                    "v", "verbose"  -> verboseFlag = true
+                    "d", "debug"    -> debugFlag = true
+                    "h", "help"     -> printHelp()
+                    "version" -> printMyVersion()
+                    "kamusi1" -> kamusiMainFile = popFileNameOrDefault(lifo,KAMUSI_FILE)
+                    "kamusi2" -> kamusiStdFile = popFileNameOrDefault(lifo,KAMUSI_STANDARD_FILE)
+                    "methali1" -> methaliStdFile = popFileNameOrDefault(lifo,METHALI_STANDARD_FILE)
+
+                    else -> printArgUsageError(args, "unknown flag: $flag")
+                }
+            }
+
         }
+    }
+
+    private fun printMyVersion() {
+        TODO("Not yet implemented")
+    }
+
+    private fun printHelp() {
+        TODO("Not yet implemented")
+    }
+
+    private fun popValueOrDefault(lifo: Stack<String>, listLineCount: Any): Any {
+        TODO("Not yet implemented")
+    }
+
+    private fun printArgUsageError(args: Array<String>, s: String) {
+        println("Command line arg input error: $s")
+        printHelp()
     }
 
 }
