@@ -108,7 +108,7 @@ object MyEnvironment {
                     "v", "verbose"  -> verboseFlag = true
                     "d", "debug"    -> debugFlag = true
                     "h", "help"     -> printHelp()
-                    "version" -> printMyVersion()
+                    "version" -> Version.printMyVersion("")
                     "kamusi1" -> kamusiMainFile = popFileNameOrDefault(lifo,KAMUSI_FILE)
                     "kamusi2" -> kamusiStdFile = popFileNameOrDefault(lifo,KAMUSI_STANDARD_FILE)
                     "methali1" -> methaliStdFile = popFileNameOrDefault(lifo,METHALI_STANDARD_FILE)
@@ -120,21 +120,26 @@ object MyEnvironment {
         }
     }
 
-    private fun printMyVersion() {
-        TODO("Not yet implemented")
-    }
+    private val argLine = "$APP_NAME [<options>" +\
+            "\n<options> ::= -v -d -n dddd --version --help" +\
+            "\n-v -- verbose, -d -- debug traces, -n dictionary list lines dddd"
 
+    // printHelp  -- outputs std arg line expected
     private fun printHelp() {
-        TODO("Not yet implemented")
+        println( argLine )
     }
 
-    private fun popValueOrDefault(lifo: Stack<String>, listLineCount: Any): Any {
-        TODO("Not yet implemented")
+    private fun popValueOrDefault(lifo: Stack<String>, default: Int): Int {
+        return default
     }
 
     private fun printArgUsageError(args: Array<String>, s: String) {
         println("Command line arg input error: $s")
         printHelp()
+    }
+
+    private fun popFileNameOrDefault(lifo: Stack<String>, default: String): String {
+        return default
     }
 
 }

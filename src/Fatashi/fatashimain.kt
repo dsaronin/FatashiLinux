@@ -1,10 +1,11 @@
-package Fatashi      // Fatashi -- a dictionary search & display package
+package Fatashi
+// Fatashi -- a dictionary search & display package
 
 // kotlin conventional starting point
 fun main(args: Array<String>) {
     MyEnvironment.setup(args)   // initialize app environment
 
-    println("\n$APP_NAME ${Version.toVersion()} starting...")
+    Version.printMyVersion( " starting..." )
     FatashiWork.work()
     println("...ending $APP_NAME")
 }

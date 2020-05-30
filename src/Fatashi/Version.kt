@@ -17,5 +17,10 @@ enum class Version(val vsn: Int)  {
          fun toComment() : String {
             return if( _VERSION_COMMENT.isBlank() ) "" else "[$_VERSION_COMMENT]"
         }
+
+        // printMyVersion  -- and anything else supplied
+        fun printMyVersion(suffix: <String> ) {
+            println("\n$APP_NAME ${Version.toVersion()} " + suffix)
+        }
     }
 }
