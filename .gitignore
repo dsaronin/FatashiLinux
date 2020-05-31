@@ -52,10 +52,14 @@ local.properties
 .project
 
 # Android Studio
-*.iml
-.idea
 .gradle
-
 
 #NDK
 obj/
+
+# IntelliJ
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dataSources.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
