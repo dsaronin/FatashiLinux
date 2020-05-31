@@ -14,13 +14,13 @@ enum class Version(val vsn: Int)  {
         }
 
     // toComment -- class-level function to return version comment
-         fun toComment() : String {
+         fun toComment(): String {
             return if( _VERSION_COMMENT.isBlank() ) "" else "[$_VERSION_COMMENT]"
         }
 
         // printMyVersion  -- and anything else supplied
-        fun printMyVersion(suffix: <String> ) {
-            println("\n$APP_NAME ${Version.toVersion()} " + suffix)
+        fun printMyVersion(strsuffix: String) {
+            println("\n$APP_NAME ${Version.toVersion()} " + strsuffix )
         }
     }
 }

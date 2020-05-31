@@ -1,6 +1,5 @@
 package Fatashi
 
-
 import java.io.FileInputStream
 import java.util.*
 
@@ -17,7 +16,7 @@ const val CONFIG_PROPERTIES="config.properties"
 // KEY and USAGE fields, coming at head or tail, each have two parts;
 // the KEY_HEAD might not be required if the search pattern begins with "^", to anchor at BOL
 // the USG_TAIL might not be required if the search pattern ends with "$", to anchor at EOL
-// for consistancy, FIELD_DEF also has HEAD and TAIL
+// for consistency, FIELD_DEF also has HEAD and TAIL
 
 const val FIELD_KEY_HEAD = "^.*"  // item KEY is first field before TAB
 const val FIELD_KEY_TAIL = ".*\t"  // item KEY is first field before TAB
@@ -28,14 +27,23 @@ const val FIELD_USG_TAIL = ".*$"  // item USAGE is third field, prior to EOL
 const val ANCHOR_HEAD = '^'     // pattern anchor for head of FIELD_KEY
 const val ANCHOR_TAIL = '$'     // pattern anchor for tail of FIELD_USG
 
-object MyEnvironment {
-    lateinit var appName: String
-    lateinit var workFilename: String
-    lateinit var productionFilename: String
-    lateinit var fieldDelimiters: String
+// DEFAULTS for ARG line options
+const val _LIST_LINE_COUNT = 20
+const val KAMUSI_STANDARD_FILE = "data/tuki_kamusi.txt"
+const val METHALI_STANDARD_FILE = "data/methali_kamusi.txt"
 
+
+object MyEnvironment {
+        // appProps will be properties read in from config.properties
     private val appProps = Properties()
 
+        // set defaults; modifiable by external properties or command line
+    var appName = APP_NAME
+    var workFilename = WORK_FILE
+    var productionFilename= PRODUCTION_FILE
+    var fieldDelimiters = FIELD_DELIMITERS
+
+        // calling arg flags
     var listLineCount = _LIST_LINE_COUNT
     var verboseFlag = false
     var debugFlag = false
@@ -43,7 +51,7 @@ object MyEnvironment {
     var kamusiStdFile = KAMUSI_STANDARD_FILE
     var methaliStdFile = METHALI_STANDARD_FILE
 
-    // load the properties file
+    // load the properties file and initialize variables
     init {
         appProps.load( FileInputStream(CONFIG_PROPERTIES) )
     }
@@ -102,13 +110,13 @@ object MyEnvironment {
                 val flag = if( !m.groupValues[1].isEmpty() ) m.groupValues[1] else m.groupValues[2]
 
                 // flag is now the extracted flag
-                println("extracted flag is: $flag")
+                // println("extracted flag is: $flag")
                 when (flag) {
                     "n"             -> listLineCount = popValueOrDefault(lifo,_LIST_LINE_COUNT)
                     "v", "verbose"  -> verboseFlag = true
                     "d", "debug"    -> debugFlag = true
                     "h", "help"     -> printHelp()
-                    "version" -> Version.printMyVersion("")
+                    "version" -> Version.printMyVersion( " " )
                     "kamusi1" -> kamusiMainFile = popFileNameOrDefault(lifo,KAMUSI_FILE)
                     "kamusi2" -> kamusiStdFile = popFileNameOrDefault(lifo,KAMUSI_STANDARD_FILE)
                     "methali1" -> methaliStdFile = popFileNameOrDefault(lifo,METHALI_STANDARD_FILE)
@@ -120,9 +128,7 @@ object MyEnvironment {
         }
     }
 
-    private val argLine = "$APP_NAME [<options>" +\
-            "\n<options> ::= -v -d -n dddd --version --help" +\
-            "\n-v -- verbose, -d -- debug traces, -n dictionary list lines dddd"
+    private val argLine = "usage: \$ $APP_NAME [<options>] \n  <options> ::= -v -d -n dddd --version --help \n  -v: verbose, -d: debug traces, -n: dictionary list lines <nn>"
 
     // printHelp  -- outputs std arg line expected
     private fun printHelp() {

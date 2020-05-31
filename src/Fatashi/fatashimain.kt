@@ -3,11 +3,12 @@ package Fatashi
 
 // kotlin conventional starting point
 fun main(args: Array<String>) {
-    MyEnvironment.setup(args)   // initialize app environment
 
     Version.printMyVersion( " starting..." )
-    FatashiWork.work()
-    println("...ending $APP_NAME")
+    MyEnvironment.setup(args)   // initialize app environment
+    FatashiWork.work()      // do the work of Fatashi
+
+    println("...ending $APP_NAME")  // say good-bye to user
 }
 
 object FatashiWork  {
