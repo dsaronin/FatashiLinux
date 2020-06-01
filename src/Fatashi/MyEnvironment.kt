@@ -1,5 +1,6 @@
 package Fatashi
 
+import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
@@ -59,13 +60,15 @@ object MyEnvironment {
     // setup -- initializes the environment
     // args -- are the cli argument list when invoked
     fun setup(args: Array<String>): Unit {
-//        listProperties()
-//        listArgList(args)
         parseArgList(args)
+        if (debugFlag) {
+            printProperties()
+            printArgList(args)
+        }
     }
 
     // listProperties -- list the config.properties file as seen by kotlin
-    fun listProperties() {
+    fun printProperties() {
         var propkeys = mutableListOf<String>()
 
         for (key in appProps.propertyNames()) {
@@ -78,32 +81,32 @@ object MyEnvironment {
         }
     }
 
-    fun listArgList(args: Array<String>) {
+    private fun printArgList(args: Array<String>) {
         println( if( args.isEmpty() ) "No args passed." else "My calling args are...")
         for (i in args.indices ) println("args[$i] is: ${args[i]}")
     }
 
     // ex: -v -n 5 -d --version --kamusi1 "dsa_dictionary.txt" --kamusi2 "tuki_kamusi.txt" --methali "methali_kamusi.txt"
 
+    // regex recognizer for short/long flags and extracts the flag w/o punctuation
+    private val flag_regex = Regex("""--?(\w\b|\w+)""")
+
     fun parseArgList(args: Array<String>) {
         if( args.isEmpty() ) return
 
         var lifo = Stack<String>()
 
-        // build stack in reverse (right-to-left) from args for top-down parsing
+        // build from args LIFO stack in reverse (right-to-left) for top-down parsing
         for( i in args.indices.reversed() ) lifo.push( args[i] )
 
-        // regex recognizer for short/long flags and extracts the flag w/o punctuation
-        val flag_regex = Regex("""-(\w\b|-\w+)""")
-
-        // now parse stack (left-to-right)
+        // now parse stack (LIFO == args left-to-right)
         while( !lifo.isEmpty() ) {
             var flagArg = lifo.pop()
 
             val matches = flag_regex.findAll( flagArg )  // recognize & extract
             val m=matches.firstOrNull()
             if (m == null) {
-                printArgUsageError(args, "invalid flag syntax: $flagArg")
+                printArgUsageError("invalid flag syntax: $flagArg")
             }
             else {
                 // extract the flag (it will be in either of the two groupings, but not both
@@ -112,7 +115,7 @@ object MyEnvironment {
                 // flag is now the extracted flag
                 // println("extracted flag is: $flag")
                 when (flag) {
-                    "n"             -> listLineCount = popValueOrDefault(lifo,_LIST_LINE_COUNT)
+                    "n"             -> listLineCount = popValueOrDefault(lifo,_LIST_LINE_COUNT.toString())
                     "v", "verbose"  -> verboseFlag = true
                     "d", "debug"    -> debugFlag = true
                     "h", "help"     -> printHelp()
@@ -121,31 +124,84 @@ object MyEnvironment {
                     "kamusi2" -> kamusiStdFile = popFileNameOrDefault(lifo,KAMUSI_STANDARD_FILE)
                     "methali1" -> methaliStdFile = popFileNameOrDefault(lifo,METHALI_STANDARD_FILE)
 
-                    else -> printArgUsageError(args, "unknown flag: $flag")
+                    else -> printArgUsageError("unknown flag: $flag")
                 }
             }
 
         }
+        if (verboseFlag) printOptions()
     }
 
-    private val argLine = "usage: \$ $APP_NAME [<options>] \n  <options> ::= -v -d -n dddd --version --help \n  -v: verbose, -d: debug traces, -n: dictionary list lines <nn>"
+    private fun printOptions() {
+        var optionList = "verbose (%b), debug (%b), list n(%d), main (%s), tuki (%s), methali (%s)"
+
+        println(
+                optionList.format(
+                        verboseFlag, debugFlag, listLineCount,
+                        kamusiMainFile, kamusiStdFile, methaliStdFile
+                )
+        )
+
+    }
 
     // printHelp  -- outputs std arg line expected
     private fun printHelp() {
+        val argLine = "\$ $APP_NAME [<options>] \n  <options> ::= -v -d -n dddd --version --help \n  -v: verbose, -d: debug traces, -n: dictionary list lines <nn>"
+
+        println("Usage and Argument line expected: ")
         println( argLine )
     }
 
-    private fun popValueOrDefault(lifo: Stack<String>, default: Int): Int {
-        return default
+    // popValueOrDefault -- peeks ahead on LIFO and pops if valid value; else default
+    private fun popValueOrDefault(lifo: Stack<String>, default: String): Int {
+            // peek at top of stack; if missing, use default
+        var num = lifo.peek() ?: default
+
+            // if it matches another flag, use default && dont pop
+        if ( flag_regex.matches( num ) ) {
+            num = default
+        }
+
+        else {
+            lifo.pop()   // then pop from stack since it wasn't the next flag
+
+            // but if it doesn't match a number
+            if ( ! """^\d+$""".toRegex().matches(num) ) {
+                   // it was an argument format error
+                printArgUsageError( num )  // warn user
+                num = default   // use default
+            }
+        }
+
+        return num.toInt()
     }
 
-    private fun printArgUsageError(args: Array<String>, s: String) {
-        println("Command line arg input error: $s")
-        printHelp()
-    }
-
+    // popFileNameOrDefault  -- peeks ahead at LIFO && pops valid filename, else default
     private fun popFileNameOrDefault(lifo: Stack<String>, default: String): String {
-        return default
+        // peek at top of stack; if missing, use default
+        var str = lifo.peek() ?: default
+
+        // if it matches another flag, use default && dont pop
+        if ( flag_regex.matches( str ) ) {
+            str = default
+        }
+
+        else {
+            lifo.pop()   // then pop from stack since it wasn't the next flag
+
+            // but if it doesn't actually match a file on the system...
+            if ( ! File( str ).exists() ) {
+                // filename wasn't valid or doesn't exist
+                printArgUsageError( "filename <$str> isn't valid or doesn't exit" )  // warn user
+                str = default   // use default
+            }
+        }
+
+        return str
+    }
+
+    private fun printArgUsageError(s: String) {
+        println("***** Command line arg input error: $s *****")
     }
 
 }

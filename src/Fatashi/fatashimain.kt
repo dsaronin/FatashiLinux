@@ -17,7 +17,7 @@ object FatashiWork  {
 
     init {
         // show that dictionary is viable & ready
-        kamusi.printStatus()
+        if ( MyEnvironment.verboseFlag ) kamusi.printStatus()
     }
 
     // fatashi work loops through commands
@@ -32,13 +32,13 @@ object FatashiWork  {
             cmd = readLine() ?: "exit"   // accept a command
 
                 // parse command
-            when (cmd) {
-                "exit"      -> loop = false   // exit program
-                "quit"      -> loop = false  // exit program
-                "tafuta"    -> kamusi.findByEntry( cmd )  // search dictionary
-                "list"      -> kamusi.listAll()   // list dictionary
-                "sts"       -> kamusi.printStatus()   // dict status
-                "help"      -> println("tafuta, list, sts, help, quit, exit")
+            when ( cmd.trim() ) {
+                "x", "ex", "exit"      -> loop = false   // exit program
+                "q", "quit"      -> loop = false  // exit program
+                "t", "tft", "tafuta"    -> kamusi.findByEntry( cmd )  // search dictionary
+                "l", "list"      -> kamusi.listAll()   // list dictionary
+                "s", "sts", "stat", "status"       -> kamusi.printStatus()   // dict status
+                "h", "help"      -> println("tafuta, list, sts, help, quit, exit")
                 else        -> println("$cmd is unrecognizable; try again!")
             }
 
