@@ -8,12 +8,15 @@ fun main(args: Array<String>) {
     MyEnvironment.setup(args)   // initialize app environment
     FatashiWork.work()      // do the work of Fatashi
 
-    println("...ending $APP_NAME")  // say good-bye to user
+    println("...ending ${MyEnvironment.appName}")  // say good-bye to user
 }
 
 object FatashiWork  {
         // instantiate kamusi
-    private val kamusi = Kamusi(KAMUSI_FILE, FIELD_DELIMITERS)
+    private val kamusi = Kamusi(
+                MyEnvironment.kamusiMainFile,
+                MyEnvironment.fieldDelimsMain
+        )
 
     init {
         // show that dictionary is viable & ready
@@ -37,8 +40,10 @@ object FatashiWork  {
                 "q", "quit"      -> loop = false  // exit program
                 "t", "tft", "tafuta"    -> kamusi.findByEntry( cmd )  // search dictionary
                 "l", "list"      -> kamusi.listAll()   // list dictionary
+                "f", "flags"      -> MyEnvironment.printOptions()  // list options
                 "s", "sts", "stat", "status"       -> kamusi.printStatus()   // dict status
-                "h", "help"      -> MyEnvironment.printInfo("tafuta, list, sts, help, quit, exit")
+                "h", "help"      -> MyEnvironment.printInfo("  tafuta, list, sts, help, quit, exit")
+                "v", "version"   -> Version.printMyVersion( " " )
                 else        -> MyEnvironment.printUsageError("$cmd is unrecognizable")
             }
 

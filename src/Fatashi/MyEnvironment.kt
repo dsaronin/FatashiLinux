@@ -4,14 +4,26 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
-// global parameters
-const val APP_NAME = "fatashi"
-const val WORK_FILE = "data/tempdict.txt"
-const val PRODUCTION_FILE = "data/dsa_dictionary.txt"
-const val FIELD_DELIMITERS = "(\\s+--\\s+)|(\t__[ \t\\x0B\\f]+)"
-const val KAMUSI_FILE = WORK_FILE
+inline fun Boolean.toChar() = this.toString().first()
 
-const val CONFIG_PROPERTIES="config.properties"
+// **************************************************************************
+// default parameters; publicly visible
+// **************************************************************************
+const val APP_NAME = "fatashi"
+const val CONFIG_PROPERTIES_FILE ="config.properties"
+
+// **************************************************************************
+// default parameters; not to be used outside of MyEnvironment
+// **************************************************************************
+
+private const val WORK_FILE             = "data/tempdict.txt"
+private const val PRODUCTION_FILE       = "data/dsa_dictionary.txt"
+private const val KAMUSI_STANDARD_FILE  = "data/tuki_kamusi.txt"
+private const val METHALI_STANDARD_FILE = "data/methali_kamusi.txt"
+
+private const val MAIN_FIELD_DELIMITERS = "(\\s+--\\s+)|(\t__[ \t\\x0B\\f]+)"
+private const val STD_FIELD_DELIMITERS  = "(\\s+--\\s+)|(\t__[ \t\\x0B\\f]+)"
+private const val METH_FIELD_DELIMITERS = "(\\s+--\\s+)|(\t__[ \t\\x0B\\f]+)"
 
 // patterns for wrapping a search string to constrain it to a given dictionary field
 // KEY and USAGE fields, coming at head or tail, each have two parts;
@@ -19,43 +31,73 @@ const val CONFIG_PROPERTIES="config.properties"
 // the USG_TAIL might not be required if the search pattern ends with "$", to anchor at EOL
 // for consistency, FIELD_DEF also has HEAD and TAIL
 
-const val FIELD_KEY_HEAD = "^.*"  // item KEY is first field before TAB
-const val FIELD_KEY_TAIL = ".*\t"  // item KEY is first field before TAB
-const val FIELD_DEF_HEAD = "^.*\t.*"  // item DEFINITION is second field between two tabs
-const val FIELD_DEF_TAIL = ".*\t"  // item DEFINITION is second field between two tabs
-const val FIELD_USG_HEAD = "^.*\t.*\t.*"  // item USAGE is third field, prior to EOL
-const val FIELD_USG_TAIL = ".*$"  // item USAGE is third field, prior to EOL
-const val ANCHOR_HEAD = '^'     // pattern anchor for head of FIELD_KEY
-const val ANCHOR_TAIL = '$'     // pattern anchor for tail of FIELD_USG
+private const val FIELD_KEY_HEAD = "^.*"  // item KEY is first field before TAB
+private const val FIELD_KEY_TAIL = ".*\t"  // item KEY is first field before TAB
+private const val FIELD_DEF_HEAD = "^.*\t.*"  // item DEFINITION is second field between two tabs
+private const val FIELD_DEF_TAIL = ".*\t"  // item DEFINITION is second field between two tabs
+private const val FIELD_USG_HEAD = "^.*\t.*\t.*"  // item USAGE is third field, prior to EOL
+private const val FIELD_USG_TAIL = ".*$"  // item USAGE is third field, prior to EOL
+private const val ANCHOR_HEAD = '^'     // pattern anchor for head of FIELD_KEY
+private const val ANCHOR_TAIL = '$'     // pattern anchor for tail of FIELD_USG
 
 // DEFAULTS for ARG line options
-const val _LIST_LINE_COUNT = 20
-const val KAMUSI_STANDARD_FILE = "data/tuki_kamusi.txt"
-const val METHALI_STANDARD_FILE = "data/methali_kamusi.txt"
+private const val LIST_LINE_COUNT = 20
 
+/*****
+ * How to read ENVIRONMENT variables
+ *   val env: MutableMap<String, String> = System.getenv()
+ *   println("Path: ${env["OS"]}")
+ *   OR
+ *   val me = System.getenv("LOGNAME")
+ *****/
 
 object MyEnvironment {
         // appProps will be properties read in from config.properties
     private val appProps = Properties()
 
-        // set defaults; modifiable by external properties or command line
-    var appName = APP_NAME
-    var workFilename = WORK_FILE
-    var productionFilename= PRODUCTION_FILE
-    var fieldDelimiters = FIELD_DELIMITERS
+    // **************************************************************************
+    // ******** MyEnvironment public properties  ********************************
+    // **************************************************************************
 
-        // calling arg flags
-    var listLineCount = _LIST_LINE_COUNT
-    var verboseFlag = false
-    var debugFlag = false
-    var kamusiMainFile = KAMUSI_FILE
-    var kamusiStdFile = KAMUSI_STANDARD_FILE
-    var methaliStdFile = METHALI_STANDARD_FILE
+    // calling argline flags
+    var listLineCount = LIST_LINE_COUNT   // how many lines of dict to list
+    var verboseFlag = false  // true if verbose status information
+    var debugFlag = false  // true if debug traces
+    var prodFlag = false  // true if use KAMUSI_MAIN_FILE
+
+    // set defaults; modifiable by external properties or command line
+    var appName = APP_NAME
+
+    var fieldDelimsMain   = MAIN_FIELD_DELIMITERS
+    var fieldDelimsStd    = STD_FIELD_DELIMITERS
+    var fieldDelimsMeth   = METH_FIELD_DELIMITERS
+
+    var  fieldKeyHead     = FIELD_KEY_HEAD
+    var  fieldKeyTail     = FIELD_KEY_TAIL
+    var  fieldDefHead     = FIELD_DEF_HEAD
+    var  fieldDefTail     = FIELD_DEF_TAIL
+    var  fieldUsgHead     = FIELD_USG_HEAD
+    var  fieldUsgTail     = FIELD_USG_TAIL
+    var  anchorHead       = ANCHOR_HEAD
+    var  anchorTail       = ANCHOR_TAIL
+
+    var workFile        = WORK_FILE
+    var productionFile  = PRODUCTION_FILE
+
+    var kamusiMainFile      = if( prodFlag ) PRODUCTION_FILE else WORK_FILE
+    var kamusiStdFile       = KAMUSI_STANDARD_FILE
+    var methaliStdFile      = METHALI_STANDARD_FILE
+
+    // **************************************************************************
+    // **************************************************************************
 
     // load the properties file and initialize variables
     init {
-        appProps.load( FileInputStream(CONFIG_PROPERTIES) )
+        loadAndSetProperties()  // get everything started
     }
+
+    // **************************************************************************
+    // **************************************************************************
 
     // setup -- initializes the environment
     // args -- are the cli argument list when invoked
@@ -67,41 +109,63 @@ object MyEnvironment {
         }
     }
 
+    // loadAndSetProperties  -- grab external configuration parameters & set
+    fun loadAndSetProperties() {
+        appProps.load( FileInputStream(CONFIG_PROPERTIES_FILE) )
+
+        productionFile    = appProps.getProperty("PRODUCTION_FILE")
+        workFile          = appProps.getProperty("WORK_FILE")
+
+            // mainfile depends on whether we're in dev or production mode
+        kamusiMainFile    = if( prodFlag ) productionFile else workFile
+        kamusiStdFile     = appProps.getProperty("KAMUSI_STANDARD_FILE")
+        methaliStdFile    = appProps.getProperty("METHALI_STANDARD_FILE")
+
+        fieldDelimsMain  = appProps.getProperty("MAIN_FIELD_DELIMITERS")
+        fieldDelimsStd   = appProps.getProperty("STD_FIELD_DELIMITERS")
+        fieldDelimsMeth  = appProps.getProperty("METH_FIELD_DELIMITERS")
+
+        fieldKeyHead     = appProps.getProperty("FIELD_KEY_HEAD")
+        fieldKeyTail     = appProps.getProperty("FIELD_KEY_TAIL")
+        fieldDefHead     = appProps.getProperty("FIELD_DEF_HEAD")
+        fieldDefTail     = appProps.getProperty("FIELD_DEF_TAIL")
+        fieldUsgHead     = appProps.getProperty("FIELD_USG_HEAD")
+        fieldUsgTail     = appProps.getProperty("FIELD_USG_TAIL")
+        anchorHead       = appProps.getProperty("ANCHOR_HEAD").first()
+        anchorTail       = appProps.getProperty("ANCHOR_TAIL").first()
+
+    }
+
     // listProperties -- list the config.properties file as seen by kotlin
     fun printProperties() {
-        var propkeys = mutableListOf<String>()
+        val propkeys = mutableListOf<String>()
 
         for (key in appProps.propertyNames()) {
             propkeys.add( key.toString() )
         }
 
         println("config property values: ")
-        for ( key in propkeys.sortedBy({it.toLowerCase()}) ) {
+        for ( key in propkeys.sortedBy {it.toLowerCase()}) {
             println("$key: >|${appProps[key]}|<")
         }
     }
 
-    private fun printArgList(args: Array<String>) {
-        println( if( args.isEmpty() ) "No args passed." else "My calling args are...")
-        for (i in args.indices ) println("args[$i] is: ${args[i]}")
-    }
-
-    // ex: -v -n 5 -d --version --kamusi1 "dsa_dictionary.txt" --kamusi2 "tuki_kamusi.txt" --methali "methali_kamusi.txt"
-
     // regex recognizer for short/long flags and extracts the flag w/o punctuation
     private val flag_regex = Regex("""--?(\w\b|\w+)""")
 
+    // parseArgList -- parse the command line argument option flags
+    // ex: -v -n 5 -d --version --kamusi1 "dsa_dictionary.txt" --kamusi2 "tuki_kamusi.txt" --methali "methali_kamusi.txt"
     fun parseArgList(args: Array<String>) {
         if( args.isEmpty() ) return
 
-        var lifo = Stack<String>()
+        val lifo = Stack<String>()
 
         // build from args LIFO stack in reverse (right-to-left) for top-down parsing
         for( i in args.indices.reversed() ) lifo.push( args[i] )
 
         // now parse stack (LIFO == args left-to-right)
         while( !lifo.isEmpty() ) {
-            var flagArg = lifo.pop()
+            val flagArg = lifo.pop()
 
             val matches = flag_regex.findAll( flagArg )  // recognize & extract
             val m=matches.firstOrNull()
@@ -115,13 +179,14 @@ object MyEnvironment {
                 // flag is now the extracted flag
                 // println("extracted flag is: $flag")
                 when (flag) {
-                    "n"             -> listLineCount = popValueOrDefault(lifo,_LIST_LINE_COUNT.toString())
+                    "n"             -> listLineCount = popValueOrDefault(lifo,LIST_LINE_COUNT.toString())
                     "v", "verbose"  -> verboseFlag = true
                     "d", "debug"    -> debugFlag = true
+                    "p", "prod"     -> prodFlag = true
                     "h", "help"     -> printHelp()
                     "version" -> Version.printMyVersion( " " )
-                    "kamusi1" -> kamusiMainFile = popFileNameOrDefault(lifo,KAMUSI_FILE)
-                    "kamusi2" -> kamusiStdFile = popFileNameOrDefault(lifo,KAMUSI_STANDARD_FILE)
+                    "kamusi1"  -> kamusiMainFile = popFileNameOrDefault(lifo, productionFile )
+                    "kamusi2"  -> kamusiStdFile = popFileNameOrDefault(lifo,KAMUSI_STANDARD_FILE)
                     "methali1" -> methaliStdFile = popFileNameOrDefault(lifo,METHALI_STANDARD_FILE)
 
                     else -> printArgUsageError("unknown flag: $flag")
@@ -132,12 +197,35 @@ object MyEnvironment {
         if (verboseFlag) printOptions()
     }
 
-    private fun printOptions() {
-        var optionList = "verbose (%b), debug (%b), list n(%d), main (%s), tuki (%s), methali (%s)"
+    // printInfo -- print something informative, wrapped in Blue
+    fun printInfo(s: String){
+        println( AnsiColor.wrapBlue( s ))
+    }
+
+    // printUsageError -- print an error, wrapped in Red
+    fun printUsageError(s: String) {
+        // System.err.println >>> not used because of weirdness against prompt line
+        println( AnsiColor.wrapRed("***** $s *****") )
+    }
+
+    // **************************************************************************
+    // *****  private internal MyEnvironment Functions  *************************
+    // **************************************************************************
+
+    // printArgList -- outputs the command line argument option flags
+    private fun printArgList(args: Array<String>) {
+        println( if( args.isEmpty() ) "No args passed." else "My calling args are...")
+        for (i in args.indices ) println("args[$i] is: ${args[i]}")
+    }
+
+    // printOptions -- display the current state of options
+    fun printOptions() {
+        val optionList = "  verbose (%c), debug (%c), prod (%c) list n(%d), main (%s), tuki (%s), methali (%s)"
 
         println(
                 optionList.format(
-                        verboseFlag, debugFlag, listLineCount,
+                        verboseFlag.toChar(), debugFlag.toChar(), prodFlag.toChar(),
+                        listLineCount,
                         kamusiMainFile, kamusiStdFile, methaliStdFile
                 )
         )
@@ -200,16 +288,7 @@ object MyEnvironment {
         return str
     }
 
-    fun printInfo(s: String){
-        println( AnsiColor.wrapBlue( s ))
-    }
-
     // ******** output usage error information ***********
-
-    fun printUsageError(s: String) {
-        // System.err.println >>> not used because of weirdness against prompt line
-        println( AnsiColor.wrapRed("***** $s *****") )
-    }
 
     private fun printArgUsageError(s: String) {
         printUsageError("Command line arg input error: $s")

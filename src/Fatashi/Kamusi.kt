@@ -2,7 +2,6 @@ package Fatashi
 
 import java.io.File
 
-
 // Dictionary handles everything re dictionary database, but has no language-specific logic
 // properties required:
 //   _kamusi_file: String,  // filename for raw dictionary
@@ -77,8 +76,8 @@ class Kamusi(
         // and FIELD_KEY_TAIL
 
         return findByEntry(
-                ( if( pattern.first().equals(ANCHOR_HEAD) ) "" else FIELD_KEY_HEAD )
-                + pattern + FIELD_KEY_TAIL
+                ( if( pattern.first().equals(MyEnvironment.anchorHead) ) "" else MyEnvironment.fieldKeyHead )
+                + pattern + MyEnvironment.fieldKeyTail
         )
     }
 
@@ -89,7 +88,7 @@ class Kamusi(
     //   list of matching strings; null if none
     fun findByDefinition(pattern: String): List<String>? {
         // wrap pattern with FIELD_DEF
-        return findByEntry( FIELD_DEF_HEAD + pattern + FIELD_DEF_TAIL)
+        return findByEntry( MyEnvironment.fieldDefHead + pattern + MyEnvironment.fieldDefTail)
     }
 
     // findByUsage  -- searches Usage field in all entries and returns list of matching entries
@@ -100,10 +99,9 @@ class Kamusi(
     fun findByUsage(pattern: String): List<String>? {
         // wrap pattern with FIELD_USG_HEAD
         // and FIELD_USG_TAIL, unless pattern ends with "$"
-
         return findByEntry(
-                FIELD_USG_HEAD + pattern +
-                        ( if( pattern.last().equals(ANCHOR_TAIL) ) "" else FIELD_USG_TAIL )
+                MyEnvironment.fieldUsgHead + pattern +
+                        ( if( pattern.last().equals(MyEnvironment.anchorTail) ) "" else MyEnvironment.fieldUsgTail )
         )
     }
 
