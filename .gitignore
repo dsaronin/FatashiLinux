@@ -29,7 +29,7 @@ dsa_dictionary.txt
 
 # vim
 *~
-.swp
+*.swp
 
 # Android built artifacts
 *.apk

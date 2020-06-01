@@ -38,8 +38,8 @@ object FatashiWork  {
                 "t", "tft", "tafuta"    -> kamusi.findByEntry( cmd )  // search dictionary
                 "l", "list"      -> kamusi.listAll()   // list dictionary
                 "s", "sts", "stat", "status"       -> kamusi.printStatus()   // dict status
-                "h", "help"      -> println("tafuta, list, sts, help, quit, exit")
-                else        -> println("$cmd is unrecognizable; try again!")
+                "h", "help"      -> MyEnvironment.printInfo("tafuta, list, sts, help, quit, exit")
+                else        -> MyEnvironment.printUsageError("$cmd is unrecognizable")
             }
 
         } while ( loop )

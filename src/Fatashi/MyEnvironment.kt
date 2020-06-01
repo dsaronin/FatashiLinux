@@ -148,8 +148,8 @@ object MyEnvironment {
     private fun printHelp() {
         val argLine = "\$ $APP_NAME [<options>] \n  <options> ::= -v -d -n dddd --version --help \n  -v: verbose, -d: debug traces, -n: dictionary list lines <nn>"
 
-        println("Usage and Argument line expected: ")
-        println( argLine )
+        println( AnsiColor.wrapBlue("Usage and Argument line expected: "))
+        println( AnsiColor.wrapBlue(argLine) )
     }
 
     // popValueOrDefault -- peeks ahead on LIFO and pops if valid value; else default
@@ -200,8 +200,19 @@ object MyEnvironment {
         return str
     }
 
+    fun printInfo(s: String){
+        println( AnsiColor.wrapBlue( s ))
+    }
+
+    // ******** output usage error information ***********
+
+    fun printUsageError(s: String) {
+        // System.err.println >>> not used because of weirdness against prompt line
+        println( AnsiColor.wrapRed("***** $s *****") )
+    }
+
     private fun printArgUsageError(s: String) {
-        println("***** Command line arg input error: $s *****")
+        printUsageError("Command line arg input error: $s")
     }
 
 }
