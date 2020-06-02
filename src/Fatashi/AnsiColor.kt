@@ -2,6 +2,7 @@ package Fatashi
 
 // ANSI escape sequences for changing display colors
 
+
 enum class AnsiColor(val code: String) {
     //Color end string, color reset
     ANSI_RESET("\u001b[0m"),

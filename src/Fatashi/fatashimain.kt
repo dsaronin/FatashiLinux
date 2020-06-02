@@ -1,6 +1,12 @@
 package Fatashi
 // Fatashi -- a dictionary search & display package
 
+// global expressions for output
+ fun printBlue(s: String) = println( AnsiColor.wrapBlue( s ) )
+ fun printWarn(s: String) = println( AnsiColor.wrapGreen( s ) )
+ fun printError(s: String) = println( AnsiColor.wrapRed( s ) )
+
+
 // kotlin conventional starting point
 fun main(args: Array<String>) {
 

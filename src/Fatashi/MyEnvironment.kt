@@ -199,13 +199,13 @@ object MyEnvironment {
 
     // printInfo -- print something informative, wrapped in Blue
     fun printInfo(s: String){
-        println( AnsiColor.wrapBlue( s ))
+        printBlue( s )
     }
 
     // printUsageError -- print an error, wrapped in Red
     fun printUsageError(s: String) {
         // System.err.println >>> not used because of weirdness against prompt line
-        println( AnsiColor.wrapRed("***** $s *****") )
+        printError("***** $s *****")
     }
 
     // **************************************************************************
@@ -236,8 +236,8 @@ object MyEnvironment {
     private fun printHelp() {
         val argLine = "\$ $APP_NAME [<options>] \n  <options> ::= -v -d -n dddd --version --help \n  -v: verbose, -d: debug traces, -n: dictionary list lines <nn>"
 
-        println( AnsiColor.wrapBlue("Usage and Argument line expected: "))
-        println( AnsiColor.wrapBlue(argLine) )
+        printBlue("Usage and Argument line expected: ")
+        printBlue(argLine)
     }
 
     // popValueOrDefault -- peeks ahead on LIFO and pops if valid value; else default

@@ -18,6 +18,10 @@ class Kamusi(
     private val kamusiFile: File
     private val fieldDelimiter: Regex
     private val dictionary: List<String>
+    private val keyModifiers = "#%&@"  // permits modification to search keys
+    private val spaceReplace = "_"      // underscores in keys are replaced by space
+    private val itemRegex = "(^\\+.+\\+$|[-~;:]?\\w+[;:]?)(\\W|[$keyModifiers])?(\\w+)?"
+
 
 // initialize by opening file, reading in raw dict, parsing fields, and splitting into records
     init {
@@ -55,9 +59,16 @@ class Kamusi(
 //************************************************************************************
 //****** search methods         *****************************************************
 //************************************************************************************
-
+/*
+*   m=matches.firstOrNull()
+*   m.groupValues[1]
+ */
     // searchKeyList -- searches dictionary using List of Keys
     fun searchKeyList(wordList: List<String>): List<String>? {
+        for (item in wordList) {
+            val keyfrag = itemRegex.toRegex().find(item) ?: continue
+            val results = findByEntry( keyfrag.groupValues[1] )
+        }
         return null
     }
 
@@ -68,7 +79,7 @@ class Kamusi(
     // returns:  List<String>
     //   list of matching strings; null if none
     fun findByEntry(pattern: String): List<String>? {
-        println("Pattern: >|$pattern|<" )
+        printBlue("  Pattern: >|$pattern|<" )
         return null
     }
 
