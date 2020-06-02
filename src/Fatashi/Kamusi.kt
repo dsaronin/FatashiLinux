@@ -56,10 +56,16 @@ class Kamusi(
 //****** search methods         *****************************************************
 //************************************************************************************
 
+    // searchKeyList -- searches dictionary using List of Keys
+    fun searchKeyList(wordList: List<String>): List<String>? {
+        return null
+    }
+
+
     // findByEntry  -- searches all entries and returns list of matching entries
     // args:
     //   pattern: string of regex search pattern
-    // returns:
+    // returns:  List<String>
     //   list of matching strings; null if none
     fun findByEntry(pattern: String): List<String>? {
         println("Pattern: >|$pattern|<" )

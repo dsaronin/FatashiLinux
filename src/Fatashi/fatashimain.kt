@@ -27,23 +27,23 @@ object FatashiWork  {
     // arg: environment (future)
 
     fun work(  ) {
-        var cmd: String
-        var loop = true
+        var loop = true  // user input loop while true
 
         do {
             print("$APP_NAME > ")  // command prompt
-            cmd = readLine() ?: "exit"   // accept a command
+            val cmdlist = readLine()?.split(' ') ?: listOf("exit")
 
                 // parse command
-            when ( cmd.trim() ) {
-                "x", "ex", "exit"      -> loop = false   // exit program
-                "q", "quit"      -> loop = false  // exit program
-                "t", "tft", "tafuta"    -> kamusi.findByEntry( cmd )  // search dictionary
-                "l", "list"      -> kamusi.listAll()   // list dictionary
+            when ( val cmd = cmdlist.first().trim() ) {
+                "x", "ex", "exit"       -> loop = false   // exit program
+                "q", "quit"             -> loop = false  // exit program
+                "t", "tft", "tafuta"    -> kamusi.searchKeyList( cmdlist.drop(1) )  // search dictionary
+                "l", "list"       -> kamusi.listAll()   // list dictionary
                 "f", "flags"      -> MyEnvironment.printOptions()  // list options
                 "s", "sts", "stat", "status"       -> kamusi.printStatus()   // dict status
                 "h", "help"      -> MyEnvironment.printInfo("  tafuta, list, sts, help, quit, exit")
                 "v", "version"   -> Version.printMyVersion( " " )
+                ""               -> true   // empty line; NOP
                 else        -> MyEnvironment.printUsageError("$cmd is unrecognizable")
             }
 
