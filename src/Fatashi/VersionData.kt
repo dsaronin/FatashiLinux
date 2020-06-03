@@ -14,7 +14,7 @@ package Fatashi
 
 const val _MAJOR_VERSION=0
 const val _MINOR_VERSION=0
-const val _PATCH_VERSION=18
+const val _PATCH_VERSION=19
 const val _VERSION_COMMENT=""
-const val _GIT_VERSION_TAG="v0.0.18 "
+const val _GIT_VERSION_TAG="v0.0.19 "
 

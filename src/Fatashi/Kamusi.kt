@@ -20,7 +20,34 @@ class Kamusi(
     private val dictionary: List<String>
     private val keyModifiers = "#%&@"  // permits modification to search keys
     private val spaceReplace = "_"      // underscores in keys are replaced by space
-    private val itemRegex = "(^\\+.+\\+$|[-~;:]?\\w+[;:]?)(\\W|[$keyModifiers])?(\\w+)?"
+    private val itemRegex = "(^=.+=$|[-~;:]?[\\w'+]+[;:]?)(\\W|[$keyModifiers])?(\\w+)?"
+    /***************************************************************************************
+     *     explanation for itemRegex (above):
+     *     either completely escape the item:
+     *     =aaaaaa= escapes item 'aaaaaa' literally to allow inclusion of RegEx operators
+     *
+     *     or use following syntax:
+     *     ; -- will be used to indicate non-word boundary anchor ( \W )
+     *          either prefixing or suffixing the item: ;aaa, aaaa;, or ;aaaa;
+     *     : -- future
+     *
+     *     within the item itself:
+     *     prefix - is used in kamusi to show a verb stem
+     *     prefix ~ is used in kamusi to show an adjectival stem
+     *     all _ (underscores) are replaced with spaces, to allow multiple words in search pattern
+     *     ' is a normal swahili indicator for syllable ng' : -ng'ang'ania  -- grip sth tightly
+     *     Future
+     *          +  -- will be used to delimit a verb stem, followed by conjunction
+     *                allowing swahili smart verb processing (see elsewhere)
+     *                -kom+esha, from -koma (stem is -kom+a)
+     *
+     *     keyModifiers come after the item and act to constrain the search
+     *          #abc  -- constrains matches only to records with (abc) qualifier in field 2: (tech)
+     *          %n    -- constrains the search to only field n of each record
+     *          &     -- invoke swahili smart processing (see elsewhere)
+     *          @     -- future
+     **********************************************************************/
+
 
 
 // initialize by opening file, reading in raw dict, parsing fields, and splitting into records
