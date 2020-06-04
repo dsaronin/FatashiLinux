@@ -124,7 +124,17 @@ class Kamusi(
     //   list of matching strings; null if none
     fun findByEntry(pattern: String): List<String>? {
         printBlue("  Pattern: >|$pattern|<" )
-        return null
+        val itemRegex = pattern.toRegex()
+        val results = dictionary.filter { itemRegex.containsMatchIn(it) }
+        printError( "results had ${results.size} entries")
+        printResults( results )
+        return results
+    }
+
+    fun printResults( res: List<String>){
+        res.forEach {
+            println( it )
+        }
     }
 
     // findByKey  -- searches Key field in all entries and returns list of matching entries
