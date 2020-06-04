@@ -102,24 +102,27 @@ class Kamusi(
                 // strip off the key fragment from the constraints
             val keyfrag = itemRegex.toRegex().find(item) ?: continue
                 // search the dictionary for that key fragment, after prepping the key
-            findByEntry( prepKey( keyfrag.groupValues[1] ) )
+                /* ****************************************************************
+                 * at this point, keyfrag has:
+                 *     keyfrag.groupValues[0] -- full search term
+                 *     keyfrag.groupValues[1] -- key
+                 *     keyfrag.groupValues[2] -- constraint code: #, %, &, @, ...
+                 *     keyfrag.groupValues[3] -- constraint parameter: abcd, nn
+                 * ****************************************************************
+                 */
+            var keyitem = prepKey( keyfrag.groupValues[1] )
+
+            // handle any kind of constraint, possibly altering keyitem
+            keyitem = when (keyfrag.groupValues[2]) {
+                "#"  -> prepTypeConstraint(keyitem, keyfrag.groupValues[3])
+                "%"  -> prepByField(keyitem, keyfrag.groupValues[3] )
+                "&"  -> prepSwahili(keyitem)
+                "@"  -> keyitem   // NOP for now; future expansion
+                else -> keyitem
+            }
+
+            findByEntry( keyitem )  // perform search, output results
         }
-    }
-
-    /*
-
-     */
-
-    // prepKey -- massages key to add/remove based on special symbols
-    // NOTE: by this point, mid-term ';' and ':' have been parsed out,
-    //       so if present, they will only be leading and trailing
-    private fun prepKey(s: String): String {
-        return s
-                .replace(";".toRegex(), """\\W""")  // non-word boundaries
-                .replace("_".toRegex(), " ")     // underscore ==> space
-                .trim()         // lead/trailing spaces
-                .removeSurrounding("=", "=")   // remove literal escape chars
-
     }
 
     // findByEntry  -- searches all entries and returns list of matching entries
@@ -152,42 +155,68 @@ class Kamusi(
         if (MyEnvironment.verboseFlag) printWarn( "${res.size} results")
     }
 
-    // findByKey  -- searches Key field in all entries and returns list of matching entries
-    // args:
-    //   pattern: string of regex search pattern
-    // returns:
-    //   list of matching strings; null if none
-    fun findByKey(pattern: String) {
-        // wrap pattern with FIELD_KEY_HEAD unless pattern begins with "^"
-        // and FIELD_KEY_TAIL
+     /*
+     * ***********************************************************************
+     * ******** massaging key & prep functions    ****************************
+     * ***********************************************************************
+     */
 
-        findByEntry(
-                ( if( pattern.first().equals(MyEnvironment.anchorHead) ) "" else MyEnvironment.fieldKeyHead )
-                + pattern + MyEnvironment.fieldKeyTail
-        )
+    // prepKey -- massages key to add/remove based on special symbols
+    // NOTE: by this point, mid-term ';' and ':' have been parsed out,
+    //       so if present, they will only be leading and trailing
+    private fun prepKey(s: String): String {
+        return s
+                .replace(";".toRegex(), """\\W""")  // non-word boundaries
+                .replace("_".toRegex(), " ")     // underscore ==> space
+                .trim()         // lead/trailing spaces
+                .removeSurrounding("=", "=")   // remove literal escape chars
+
+    }
+
+    // handleByField  -- massage key to constrain the search to a given dict field
+    // also handles the search & printout
+    private fun prepByField(keyitem: String, dfield: String): String {
+        return when (dfield) {
+            "1"  -> constrainToKeyField( keyitem )
+            "2"  -> constrainToDefField( keyitem )
+            "3"  -> constrainToUsageField( keyitem )
+            else -> constrainToKeyField( keyitem )
+        }
+    }
+
+    // prepConstraint  -- preps a constraint for the search
+    private fun prepTypeConstraint(keyitem: String, cfield: String): String {
+        return keyitem
+    }
+
+    // prepSwahili -- preps the item for expanded swahili handling
+    private fun prepSwahili(keyitem: String): String  {
+        return keyitem
+    }
+
+    // findByKey  -- searches Key field in all entries and returns list of matching entries
+    // wrap pattern with FIELD_KEY_HEAD unless pattern begins with "^"
+    // and FIELD_KEY_TAIL
+    private fun constrainToKeyField(pattern: String): String {
+        return (
+            if( pattern.first().equals(MyEnvironment.anchorHead)
+        ) "" else MyEnvironment.fieldKeyHead ) + pattern + MyEnvironment.fieldKeyTail
+
     }
 
     // findByDefinition  -- searches Definition field in all entries and returns list of matching entries
-    // args:
-    //   pattern: string of regex search pattern
-    // returns:
-    //   list of matching strings; null if none
-    fun findByDefinition(pattern: String) {
-        // wrap pattern with FIELD_DEF
-        findByEntry( MyEnvironment.fieldDefHead + pattern + MyEnvironment.fieldDefTail)
+    // wrap pattern with FIELD_DEF
+    private fun constrainToDefField(pattern: String): String {
+        return ( MyEnvironment.fieldDefHead + pattern + MyEnvironment.fieldDefTail)
     }
 
     // findByUsage  -- searches Usage field in all entries and returns list of matching entries
-    // args:
-    //   pattern: string of regex search pattern
-    // returns:
-    //   list of matching strings; null if none
-    fun findByUsage(pattern: String) {
-        // wrap pattern with FIELD_USG_HEAD
-        // and FIELD_USG_TAIL, unless pattern ends with "$"
-        findByEntry(
+    // wrap pattern with FIELD_USG_HEAD
+    // and FIELD_USG_TAIL, unless pattern ends with "$"
+    private fun constrainToUsageField(pattern: String): String {
+        return (
                 MyEnvironment.fieldUsgHead + pattern +
-                        ( if( pattern.last().equals(MyEnvironment.anchorTail) ) "" else MyEnvironment.fieldUsgTail )
+                ( if( pattern.last().equals(MyEnvironment.anchorTail) ) "" else MyEnvironment.fieldUsgTail )
         )
     }
 
