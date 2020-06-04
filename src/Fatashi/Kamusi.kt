@@ -94,11 +94,28 @@ class Kamusi(
     fun searchKeyList(wordList: List<String>): List<String>? {
         for (item in wordList) {
             val keyfrag = itemRegex.toRegex().find(item) ?: continue
-            val results = findByEntry( keyfrag.groupValues[1] )
+            val results = findByEntry(
+                    prepKey( keyfrag.groupValues[1] )
+            )
         }
         return null
     }
 
+    /*
+
+     */
+
+    // prepKey -- massages key to add/remove based on special symbols
+    // NOTE: by this point, mid-term ';' and ':' have been parsed out,
+    //       so if present, they will only be leading and trailing
+    private fun prepKey(s: String): String {
+        return s
+                .replace(";".toRegex(), """\\W""")  // non-word boundaries
+                .replace("_".toRegex(), " ")     // underscore ==> space
+                .trim()         // lead/trailing spaces
+                .removeSurrounding("=", "=")   // remove literal escape chars
+
+    }
 
     // findByEntry  -- searches all entries and returns list of matching entries
     // args:
