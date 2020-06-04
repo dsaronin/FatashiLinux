@@ -17,6 +17,10 @@ class Kamusi(
     // Object properties
     private val kamusiFile: File
     private val fieldDelimiter: Regex
+    private val internalFields = _internal_fields
+    private val recordDelimiter = _record_delimiter
+    private val showKeyDelim = "\t-- "
+    private val showUsgDelim = ":\t "
     private val dictionary: List<String>
     private val keyModifiers = "#%&@"  // permits modification to search keys
     private val spaceReplace = "_"      // underscores in keys are replaced by space
@@ -91,14 +95,15 @@ class Kamusi(
 *   m.groupValues[1]
  */
     // searchKeyList -- searches dictionary using List of Keys
-    fun searchKeyList(wordList: List<String>): List<String>? {
+    fun searchKeyList(wordList: List<String>) {
+        // for each search key in list, search the dictionary
         for (item in wordList) {
+            print( AnsiColor.wrapGreen(">>>>>>>>> $item >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"))
+                // strip off the key fragment from the constraints
             val keyfrag = itemRegex.toRegex().find(item) ?: continue
-            val results = findByEntry(
-                    prepKey( keyfrag.groupValues[1] )
-            )
+                // search the dictionary for that key fragment, after prepping the key
+            findByEntry( prepKey( keyfrag.groupValues[1] ) )
         }
-        return null
     }
 
     /*
@@ -120,21 +125,31 @@ class Kamusi(
     // findByEntry  -- searches all entries and returns list of matching entries
     // args:
     //   pattern: string of regex search pattern
-    // returns:  List<String>
-    //   list of matching strings; null if none
-    fun findByEntry(pattern: String): List<String>? {
-        printBlue("  Pattern: >|$pattern|<" )
-        val itemRegex = pattern.toRegex()
-        val results = dictionary.filter { itemRegex.containsMatchIn(it) }
-        printError( "results had ${results.size} entries")
-        printResults( results )
-        return results
+    fun findByEntry(pattern: String) {
+        // display the search pattern if verbose
+        if (MyEnvironment.verboseFlag) print(AnsiColor.wrapGreen(">|$pattern|<")+"\n" )
+        val itemRegex = pattern.toRegex()  // convert key to regex
+            // display results, if any found
+        printResults(
+                    // filter dictionary grabbing only records with a match
+                dictionary.filter { itemRegex.containsMatchIn(it) },
+                itemRegex
+        )
     }
 
-    fun printResults( res: List<String>){
+    // printResults  -- handles all output for found items
+    // output consists in pretty formatting dictionary entry, then highlighting found items
+    // args:
+    //   res: list of dictionary entries with at least one match
+    //   rex: the regex of the search key determining that match
+    fun printResults( res: List<String>, rex: Regex ){
         res.forEach {
-            println( it )
+            // output each line after highlighting the found text
+            println( it
+                    .replace(internalFields, showKeyDelim)
+                    .replace(rex) { AnsiColor.wrapBlueBold( it.groupValues[0] )} )
         }
+        if (MyEnvironment.verboseFlag) printWarn( "${res.size} results")
     }
 
     // findByKey  -- searches Key field in all entries and returns list of matching entries
@@ -142,11 +157,11 @@ class Kamusi(
     //   pattern: string of regex search pattern
     // returns:
     //   list of matching strings; null if none
-    fun findByKey(pattern: String): List<String>? {
+    fun findByKey(pattern: String) {
         // wrap pattern with FIELD_KEY_HEAD unless pattern begins with "^"
         // and FIELD_KEY_TAIL
 
-        return findByEntry(
+        findByEntry(
                 ( if( pattern.first().equals(MyEnvironment.anchorHead) ) "" else MyEnvironment.fieldKeyHead )
                 + pattern + MyEnvironment.fieldKeyTail
         )
@@ -157,9 +172,9 @@ class Kamusi(
     //   pattern: string of regex search pattern
     // returns:
     //   list of matching strings; null if none
-    fun findByDefinition(pattern: String): List<String>? {
+    fun findByDefinition(pattern: String) {
         // wrap pattern with FIELD_DEF
-        return findByEntry( MyEnvironment.fieldDefHead + pattern + MyEnvironment.fieldDefTail)
+        findByEntry( MyEnvironment.fieldDefHead + pattern + MyEnvironment.fieldDefTail)
     }
 
     // findByUsage  -- searches Usage field in all entries and returns list of matching entries
@@ -167,10 +182,10 @@ class Kamusi(
     //   pattern: string of regex search pattern
     // returns:
     //   list of matching strings; null if none
-    fun findByUsage(pattern: String): List<String>? {
+    fun findByUsage(pattern: String) {
         // wrap pattern with FIELD_USG_HEAD
         // and FIELD_USG_TAIL, unless pattern ends with "$"
-        return findByEntry(
+        findByEntry(
                 MyEnvironment.fieldUsgHead + pattern +
                         ( if( pattern.last().equals(MyEnvironment.anchorTail) ) "" else MyEnvironment.fieldUsgTail )
         )
