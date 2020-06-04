@@ -31,12 +31,12 @@ private const val METH_FIELD_DELIMITERS = "(\\s+--\\s+)|(\t__[ \t\\x0B\\f]+)"
 // the USG_TAIL might not be required if the search pattern ends with "$", to anchor at EOL
 // for consistency, FIELD_DEF also has HEAD and TAIL
 
-private const val FIELD_KEY_HEAD = "^.*"  // item KEY is first field before TAB
-private const val FIELD_KEY_TAIL = ".*\t"  // item KEY is first field before TAB
-private const val FIELD_DEF_HEAD = "^.*\t.*"  // item DEFINITION is second field between two tabs
-private const val FIELD_DEF_TAIL = ".*\t"  // item DEFINITION is second field between two tabs
-private const val FIELD_USG_HEAD = "^.*\t.*\t.*"  // item USAGE is third field, prior to EOL
-private const val FIELD_USG_TAIL = ".*$"  // item USAGE is third field, prior to EOL
+private const val FIELD_KEY_HEAD = """^[^\t]*"""  // item KEY is first field before TAB
+private const val FIELD_KEY_TAIL = """[^\t]*\t"""  // item KEY is first field before TAB
+private const val FIELD_DEF_HEAD = """^[^\t]+\t[^\t]*"""  // item DEFINITION is second field between two tabs
+private const val FIELD_DEF_TAIL = """[^\t]*\t"""  // item DEFINITION is second field between two tabs
+private const val FIELD_USG_HEAD = """^[^\t]+\t[^\t]+\t[^\t]*"""  // item USAGE is third field, prior to EOL
+private const val FIELD_USG_TAIL = """[^\t]*$"""  // item USAGE is third field, prior to EOL
 private const val ANCHOR_HEAD = '^'     // pattern anchor for head of FIELD_KEY
 private const val ANCHOR_TAIL = '$'     // pattern anchor for tail of FIELD_USG
 
@@ -113,26 +113,26 @@ object MyEnvironment {
     fun loadAndSetProperties() {
         appProps.load( FileInputStream(CONFIG_PROPERTIES_FILE) )
 
-        productionFile    = appProps.getProperty("PRODUCTION_FILE")
-        workFile          = appProps.getProperty("WORK_FILE")
+        productionFile    = appProps.getProperty("PRODUCTION_FILE") ?: PRODUCTION_FILE
+        workFile          = appProps.getProperty("WORK_FILE") ?: WORK_FILE
 
             // mainfile depends on whether we're in dev or production mode
         kamusiMainFile    = if( prodFlag ) productionFile else workFile
-        kamusiStdFile     = appProps.getProperty("KAMUSI_STANDARD_FILE")
-        methaliStdFile    = appProps.getProperty("METHALI_STANDARD_FILE")
+        kamusiStdFile     = appProps.getProperty("KAMUSI_STANDARD_FILE") ?: KAMUSI_STANDARD_FILE
+        methaliStdFile    = appProps.getProperty("METHALI_STANDARD_FILE") ?: METHALI_STANDARD_FILE
 
-        fieldDelimsMain  = appProps.getProperty("MAIN_FIELD_DELIMITERS")
-        fieldDelimsStd   = appProps.getProperty("STD_FIELD_DELIMITERS")
-        fieldDelimsMeth  = appProps.getProperty("METH_FIELD_DELIMITERS")
+        fieldDelimsMain  = appProps.getProperty("MAIN_FIELD_DELIMITERS") ?: MAIN_FIELD_DELIMITERS
+        fieldDelimsStd   = appProps.getProperty("STD_FIELD_DELIMITERS") ?: STD_FIELD_DELIMITERS
+        fieldDelimsMeth  = appProps.getProperty("METH_FIELD_DELIMITERS") ?: METH_FIELD_DELIMITERS
 
-        fieldKeyHead     = appProps.getProperty("FIELD_KEY_HEAD")
-        fieldKeyTail     = appProps.getProperty("FIELD_KEY_TAIL")
-        fieldDefHead     = appProps.getProperty("FIELD_DEF_HEAD")
-        fieldDefTail     = appProps.getProperty("FIELD_DEF_TAIL")
-        fieldUsgHead     = appProps.getProperty("FIELD_USG_HEAD")
-        fieldUsgTail     = appProps.getProperty("FIELD_USG_TAIL")
-        anchorHead       = appProps.getProperty("ANCHOR_HEAD").first()
-        anchorTail       = appProps.getProperty("ANCHOR_TAIL").first()
+        fieldKeyHead     = appProps.getProperty("FIELD_KEY_HEAD") ?: FIELD_KEY_HEAD
+        fieldKeyTail     = appProps.getProperty("FIELD_KEY_TAIL") ?: FIELD_KEY_TAIL
+        fieldDefHead     = appProps.getProperty("FIELD_DEF_HEAD") ?: FIELD_DEF_HEAD
+        fieldDefTail     = appProps.getProperty("FIELD_DEF_TAIL") ?: FIELD_DEF_TAIL
+        fieldUsgHead     = appProps.getProperty("FIELD_USG_HEAD") ?: FIELD_USG_HEAD
+        fieldUsgTail     = appProps.getProperty("FIELD_USG_TAIL") ?: FIELD_USG_TAIL
+        anchorHead       = appProps.getProperty("ANCHOR_HEAD")?.first() ?: ANCHOR_HEAD
+        anchorTail       = appProps.getProperty("ANCHOR_TAIL")?.first() ?: ANCHOR_TAIL
 
     }
 

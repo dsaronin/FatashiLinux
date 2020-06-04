@@ -110,10 +110,10 @@ class Kamusi(
                  *     keyfrag.groupValues[3] -- constraint parameter: abcd, nn
                  * ****************************************************************
                  */
-            var keyitem = prepKey( keyfrag.groupValues[1] )
+            val keyitem = prepKey( keyfrag.groupValues[1] )  // keyitem is the basic key we're looking for
 
-            // handle any kind of constraint, possibly altering keyitem
-            keyitem = when (keyfrag.groupValues[2]) {
+            // handle any kind of constraint forming a regex search pattern
+            val pattern = when (keyfrag.groupValues[2]) {
                 "#"  -> prepTypeConstraint(keyitem, keyfrag.groupValues[3])
                 "%"  -> prepByField(keyitem, keyfrag.groupValues[3] )
                 "&"  -> prepSwahili(keyitem)
@@ -121,14 +121,15 @@ class Kamusi(
                 else -> keyitem
             }
 
-            findByEntry( keyitem )  // perform search, output results
+            findByEntry( pattern, keyitem )  // perform search, output results
         }
     }
 
     // findByEntry  -- searches all entries and returns list of matching entries
     // args:
     //   pattern: string of regex search pattern
-    fun findByEntry(pattern: String) {
+    //   item: basic item (used for highlighting output)
+    fun findByEntry(pattern: String, item: String) {
         // display the search pattern if verbose
         if (MyEnvironment.verboseFlag) print(AnsiColor.wrapGreen(">|$pattern|<")+"\n" )
         val itemRegex = pattern.toRegex()  // convert key to regex
@@ -136,7 +137,7 @@ class Kamusi(
         printResults(
                     // filter dictionary grabbing only records with a match
                 dictionary.filter { itemRegex.containsMatchIn(it) },
-                itemRegex
+                item.toRegex()
         )
     }
 
