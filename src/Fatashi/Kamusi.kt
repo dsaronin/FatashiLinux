@@ -98,7 +98,7 @@ class Kamusi(
     fun searchKeyList(wordList: List<String>) {
         // for each search key in list, search the dictionary
         for (item in wordList) {
-            print( AnsiColor.wrapGreen(">>>>>>>>> $item >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"))
+            print( AnsiColor.wrapGreen(">>>>>>>>> $item >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>") )
                 // strip off the key fragment from the constraints
             val keyfrag = itemRegex.toRegex().find(item) ?: continue
                 // search the dictionary for that key fragment, after prepping the key
@@ -111,17 +111,18 @@ class Kamusi(
                  * ****************************************************************
                  */
             val keyitem = prepKey( keyfrag.groupValues[1] )  // keyitem is the basic key we're looking for
+            val typeConstraint = prepTypeConstraint(keyfrag.groupValues[3])  // default is no type constraint
 
             // handle any kind of constraint forming a regex search pattern
             val pattern = when (keyfrag.groupValues[2]) {
-                "#"  -> prepTypeConstraint(keyitem, keyfrag.groupValues[3])
+                "#"  -> keyitem
                 "%"  -> prepByField(keyitem, keyfrag.groupValues[3] )
                 "&"  -> prepSwahili(keyitem)
                 "@"  -> keyitem   // NOP for now; future expansion
                 else -> keyitem
             }
 
-            findByEntry( pattern, keyitem )  // perform search, output results
+            findByEntry( pattern, keyitem, typeConstraint )  // perform search, output results
         }
     }
 
@@ -129,16 +130,15 @@ class Kamusi(
     // args:
     //   pattern: string of regex search pattern
     //   item: basic item (used for highlighting output)
-    fun findByEntry(pattern: String, item: String) {
+    //   constraint: constraint to further limit the result list unless constraint.isEmpty()
+    fun findByEntry(pattern: String, item: String, constraint: String) {
         // display the search pattern if verbose
-        if (MyEnvironment.verboseFlag) print(AnsiColor.wrapGreen(">|$pattern|<")+"\n" )
+        if (MyEnvironment.verboseFlag) print(AnsiColor.wrapGreen(">|$pattern|<<<<$constraint\n") )
         val itemRegex = pattern.toRegex()  // convert key to regex
-            // display results, if any found
-        printResults(
-                    // filter dictionary grabbing only records with a match
-                dictionary.filter { itemRegex.containsMatchIn(it) },
-                item.toRegex()
-        )
+
+        // filter dictionary grabbing only records with a match
+        val resList = dictionary.filter { itemRegex.containsMatchIn(it) }
+        printResults( resList, item.toRegex() )  // display results, if any found
     }
 
     // printResults  -- handles all output for found items
@@ -186,8 +186,8 @@ class Kamusi(
     }
 
     // prepConstraint  -- preps a constraint for the search
-    private fun prepTypeConstraint(keyitem: String, cfield: String): String {
-        return keyitem
+    private fun prepTypeConstraint(cfield: String): String {
+        return ( if(cfield.isEmpty()) "" else constrainToDefField("($cfield)" ))
     }
 
     // prepSwahili -- preps the item for expanded swahili handling
