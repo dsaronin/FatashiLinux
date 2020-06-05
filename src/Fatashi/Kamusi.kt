@@ -111,13 +111,16 @@ class Kamusi(
                  * ****************************************************************
                  */
             val keyitem = prepKey( keyfrag.groupValues[1] )  // keyitem is the basic key we're looking for
-            val typeConstraint = prepTypeConstraint(keyfrag.groupValues[3])  // default is no type constraint
+            var typeConstraint = ""  // default is no type constraint
 
             // handle any kind of constraint forming a regex search pattern
             val pattern = when (keyfrag.groupValues[2]) {
-                "#"  -> keyitem
-                "%"  -> prepByField(keyitem, keyfrag.groupValues[3] )
-                "&"  -> prepSwahili(keyitem)
+                "#"  -> {
+                        typeConstraint = prepTypeConstraint( keyfrag.groupValues[3] )
+                        keyitem   // return value from block
+                        }
+                "%"  -> prepByField(keyitem, keyfrag.groupValues[3])  // returns updated keyitem
+                "&"  -> prepSwahili(keyitem)   // returns updated keyitem
                 "@"  -> keyitem   // NOP for now; future expansion
                 else -> keyitem
             }
@@ -138,7 +141,13 @@ class Kamusi(
 
         // filter dictionary grabbing only records with a match
         val resList = dictionary.filter { itemRegex.containsMatchIn(it) }
-        printResults( resList, item.toRegex() )  // display results, if any found
+        printResults(
+                if( constraint.isEmpty() ) resList else {
+                    val conregex = constraint.toRegex()
+                    resList.filter { conregex.containsMatchIn(it) }
+                },
+                item.toRegex()
+        )  // display results, if any found
     }
 
     // printResults  -- handles all output for found items
