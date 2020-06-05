@@ -107,6 +107,9 @@ object MyEnvironment {
             printProperties()
             printArgList(args)
         }
+        // mainfile depends on whether we're in dev or production mode
+        kamusiMainFile    = if( prodFlag ) productionFile else workFile
+        if (verboseFlag) printOptions()
     }
 
     // loadAndSetProperties  -- grab external configuration parameters & set
@@ -116,8 +119,6 @@ object MyEnvironment {
         productionFile    = appProps.getProperty("PRODUCTION_FILE") ?: PRODUCTION_FILE
         workFile          = appProps.getProperty("WORK_FILE") ?: WORK_FILE
 
-            // mainfile depends on whether we're in dev or production mode
-        kamusiMainFile    = if( prodFlag ) productionFile else workFile
         kamusiStdFile     = appProps.getProperty("KAMUSI_STANDARD_FILE") ?: KAMUSI_STANDARD_FILE
         methaliStdFile    = appProps.getProperty("METHALI_STANDARD_FILE") ?: METHALI_STANDARD_FILE
 
@@ -194,7 +195,6 @@ object MyEnvironment {
             }
 
         }
-        if (verboseFlag) printOptions()
     }
 
     // printInfo -- print something informative, wrapped in Blue

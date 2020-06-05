@@ -47,8 +47,9 @@ object FatashiWork  {
                 "l", "list"       -> kamusi.listAll()   // list dictionary
                 "f", "flags"      -> MyEnvironment.printOptions()  // list options
                 "s", "sts", "stat", "status"       -> kamusi.printStatus()   // dict status
-                "h", "help"      -> MyEnvironment.printInfo("  tafuta, list, sts, help, quit, exit")
+                "h", "help"      -> MyEnvironment.printInfo("  tafuta, list, sts, options, help, quit, exit")
                 "v", "version"   -> Version.printMyVersion( " " )
+                "o", "optioins"  -> MyEnvironment.printOptions()
                 ""               -> true   // empty line; NOP
                 else        -> MyEnvironment.printUsageError("$cmd is unrecognizable")
             }

@@ -110,7 +110,7 @@ class Kamusi(
                  *     keyfrag.groupValues[3] -- constraint parameter: abcd, nn
                  * ****************************************************************
                  */
-            val keyitem = prepKey( keyfrag.groupValues[1] )  // keyitem is the basic key we're looking for
+            var keyitem = prepKey( keyfrag.groupValues[1] )  // keyitem is the basic key we're looking for
             var typeConstraint = ""  // default is no type constraint
 
             // handle any kind of constraint forming a regex search pattern
@@ -120,7 +120,10 @@ class Kamusi(
                         keyitem   // return value from block
                         }
                 "%"  -> prepByField(keyitem, keyfrag.groupValues[3])  // returns updated keyitem
-                "&"  -> prepSwahili(keyitem)   // returns updated keyitem
+                "&"  -> {
+                    keyitem = Swahili.postProcessKey(keyitem) // we want this to be the value highlighted!
+                    keyitem
+                }   // returns updated keyitem
                 "@"  -> keyitem   // NOP for now; future expansion
                 else -> keyitem
             }
@@ -175,12 +178,11 @@ class Kamusi(
     // NOTE: by this point, mid-term ';' and ':' have been parsed out,
     //       so if present, they will only be leading and trailing
     private fun prepKey(s: String): String {
-        return s
-                .replace(";".toRegex(), """\\W""")  // non-word boundaries
+        return Swahili.preProcessKey(s)
+                .replace(";".toRegex(), """\\b""")  // non-word boundaries
                 .replace("_".toRegex(), " ")     // underscore ==> space
                 .trim()         // lead/trailing spaces
                 .removeSurrounding("=", "=")   // remove literal escape chars
-
     }
 
     // handleByField  -- massage key to constrain the search to a given dict field
@@ -197,11 +199,6 @@ class Kamusi(
     // prepConstraint  -- preps a constraint for the search
     private fun prepTypeConstraint(cfield: String): String {
         return ( if(cfield.isEmpty()) "" else constrainToDefField("($cfield)" ))
-    }
-
-    // prepSwahili -- preps the item for expanded swahili handling
-    private fun prepSwahili(keyitem: String): String  {
-        return keyitem
     }
 
     // findByKey  -- searches Key field in all entries and returns list of matching entries
