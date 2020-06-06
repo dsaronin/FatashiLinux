@@ -76,7 +76,7 @@ class Kamusi(
 
     // printStatus -- output status of dictionary
     fun printStatus() {
-        println( "My dictionary, $kamusiFile (readable: ${kamusiFile.canRead()}), has ${dictionary.count()} entries")
+        printInfo( "  $kamusiFile has ${dictionary.count()} entries")
     }
 
     // listAll -- output entire dictionary internal representation
@@ -98,7 +98,7 @@ class Kamusi(
     fun searchKeyList(wordList: List<String>) {
         // for each search key in list, search the dictionary
         for (item in wordList) {
-            print( AnsiColor.wrapGreen(">>>>>>>>> $item >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>") )
+            printDivider(">>>>>>>>> $item >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" )
                 // strip off the key fragment from the constraints
             val keyfrag = itemRegex.toRegex().find(item) ?: continue
                 // search the dictionary for that key fragment, after prepping the key
@@ -132,14 +132,18 @@ class Kamusi(
         }
     }
 
+    private fun printDivider(s: String) {
+        if (MyEnvironment.verboseFlag) printVisual(s)
+    }
+
     // findByEntry  -- searches all entries and returns list of matching entries
     // args:
     //   pattern: string of regex search pattern
     //   item: basic item (used for highlighting output)
     //   constraint: constraint to further limit the result list unless constraint.isEmpty()
     fun findByEntry(pattern: String, item: String, constraint: String) {
-        // display the search pattern if verbose
-        if (MyEnvironment.verboseFlag) print(AnsiColor.wrapGreen(">|$pattern|<<<<$constraint\n") )
+        // display the search pattern in a divider line
+        printDivider(">|$pattern|<<<<$constraint\n")
         val itemRegex = pattern.toRegex()  // convert key to regex
 
         // filter dictionary grabbing only records with a match
@@ -165,7 +169,7 @@ class Kamusi(
                     .replace(internalFields, showKeyDelim)
                     .replace(rex) { AnsiColor.wrapBlueBold( it.groupValues[0] )} )
         }
-        if (MyEnvironment.verboseFlag) printWarn( "${res.size} results")
+        printDivider( "${res.size} results\n")
     }
 
      /*

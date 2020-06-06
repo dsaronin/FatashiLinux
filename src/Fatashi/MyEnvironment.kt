@@ -4,7 +4,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
-inline fun Boolean.toChar() = this.toString().first()
+fun Boolean.toChar() = this.toString().first()
 
 // **************************************************************************
 // default parameters; publicly visible
@@ -199,7 +199,7 @@ object MyEnvironment {
 
     // printInfo -- print something informative, wrapped in Blue
     fun printInfo(s: String){
-        printBlue( s )
+        Fatashi.printInfo( s )
     }
 
     // printUsageError -- print an error, wrapped in Red
@@ -222,7 +222,7 @@ object MyEnvironment {
     fun printOptions() {
         val optionList = "  verbose (%c), debug (%c), prod (%c) list n(%d), main (%s), tuki (%s), methali (%s)"
 
-        println(
+        printInfo(
                 optionList.format(
                         verboseFlag.toChar(), debugFlag.toChar(), prodFlag.toChar(),
                         listLineCount,
@@ -236,8 +236,8 @@ object MyEnvironment {
     private fun printHelp() {
         val argLine = "\$ $APP_NAME [<options>] \n  <options> ::= -v -d -n dddd --version --help \n  -v: verbose, -d: debug traces, -n: dictionary list lines <nn>"
 
-        printBlue("Usage and Argument line expected: ")
-        printBlue(argLine)
+        Fatashi.printInfo("Usage and Argument line expected: ")
+        Fatashi.printInfo(argLine)
     }
 
     // popValueOrDefault -- peeks ahead on LIFO and pops if valid value; else default

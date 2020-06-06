@@ -82,10 +82,20 @@ enum class AnsiColor(val code: String) {
     }
 
     companion object {
+        fun wrapCyan(str: String) = ANSI_CYAN.toString() + str + ANSI_RESET.toString()
+        fun wrapCyanBold(str: String) = CYAN_BOLD.toString() + str + ANSI_RESET.toString()
+
         fun wrapBlue(str: String) = ANSI_BLUE.toString() + str + ANSI_RESET.toString()
         fun wrapBlueBold(str: String) = BLUE_BOLD.toString() + str + ANSI_RESET.toString()
+
         fun wrapGreen(str: String) = ANSI_GREEN.toString() + str + ANSI_RESET.toString()
-        fun wrapRed(str: String) = RED_BOLD.toString() + str + ANSI_RESET.toString()
+        fun wrapGreenBold(str: String) = GREEN_BOLD.toString() + str + ANSI_RESET.toString()
+
+        fun wrapRed(str: String) = ANSI_RED.toString() + str + ANSI_RESET.toString()
+        fun wrapRedBold(str: String) = RED_BOLD.toString() + str + ANSI_RESET.toString()
+
+        fun wrapYellow(str: String) = ANSI_YELLOW.toString() + str + ANSI_RESET.toString()
+        fun wrapYellowBold(str: String) = YELLOW_BOLD.toString() + str + ANSI_RESET.toString()
     }
 
 }
