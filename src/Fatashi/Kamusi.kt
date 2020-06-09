@@ -144,16 +144,16 @@ class Kamusi(
     fun findByEntry(pattern: String, item: String, constraint: String) {
         // display the search pattern in a divider line
         printDivider(">|$pattern|<<<<$constraint\n")
-        val itemRegex = pattern.toRegex()  // convert key to regex
+        val itemRegex = pattern.toRegex(RegexOption.IGNORE_CASE)  // convert key to regex
 
         // filter dictionary grabbing only records with a match
         val resList = dictionary.filter { itemRegex.containsMatchIn(it) }
         printResults(
                 if( constraint.isEmpty() ) resList else {
-                    val conregex = constraint.toRegex()
+                    val conregex = constraint.toRegex(RegexOption.IGNORE_CASE)
                     resList.filter { conregex.containsMatchIn(it) }
                 },
-                item.toRegex()
+                item.toRegex(RegexOption.IGNORE_CASE)
         )  // display results, if any found
     }
 

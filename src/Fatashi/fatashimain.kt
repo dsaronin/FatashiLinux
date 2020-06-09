@@ -38,7 +38,7 @@ object FatashiWork  {
 
         do {
             printPrompt("${MyEnvironment.appName} > ")  // command prompt
-            val cmdlist = readLine()?.split(' ') ?: listOf("exit")
+            val cmdlist = readLine()?.trim()?.split(' ') ?: listOf("exit")
 
                 // parse command
             when ( val cmd = cmdlist.first().trim() ) {

@@ -8,16 +8,17 @@ object Swahili {
     // note that English-words should be escaped with a ";" as the first symbol
     // thus preventing any swahili substitutions
    fun preProcessKey(key: String): String {
-       return key.replace("^ma".toRegex(), "\\\\b(ma)?")  // [li-ya] sing/plurals
-                 .replace("^mi".toRegex(), "\\\\bmi?")    //  [u-i] sing/plurals
-                 .replace("^vi".toRegex(), "\\\\b[kv]i") //  [ki-vi] sing/plurals
-                 .replace("^-ji".toRegex(), "-(ji)?") //  [ki-vi] sing/plurals
+       return key.replace("^ma".toRegex(RegexOption.IGNORE_CASE), "\\\\b(ma)?")  // [li-ya] sing/plurals
+                 .replace("^mi".toRegex(RegexOption.IGNORE_CASE), "\\\\bmi?")    //  [u-i] sing/plurals
+                 .replace("^vi".toRegex(RegexOption.IGNORE_CASE), "\\\\b[kv]i") //  [ki-vi] sing/plurals
+                 .replace("^-ji".toRegex(RegexOption.IGNORE_CASE), "-(ji)?") //  [ki-vi] sing/pluralss
+                 .replace("ni$".toRegex(RegexOption.IGNORE_CASE), "(ni)?") //  trailing place sufficx
 
    }
 
    fun postProcessKey(key: String): String {
-       return key.replace("l|r".toRegex(), "[lr]")
-               .replace("z".toRegex(), "(z|dh)")
-               .replace("^mu".toRegex(), "m[uw]")
+       return key.replace("l|r".toRegex(RegexOption.IGNORE_CASE), "[lr]")
+               .replace("z".toRegex(RegexOption.IGNORE_CASE), "(z|dh)")
+               .replace("^mu".toRegex(RegexOption.IGNORE_CASE), "m[uw]")
    }
 }
