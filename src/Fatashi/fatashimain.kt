@@ -1,4 +1,7 @@
 package Fatashi
+
+
+
 // Fatashi -- a dictionary search & display package
 
 // global expressions for output
@@ -14,10 +17,18 @@ fun main(args: Array<String>) {
 
     Version.printMyVersion( " starting..." )
     MyEnvironment.setup(args)   // initialize app environment
+
+    val kamusiFormat = readJsonKamusiFormats("data/tempdict.json")
+    println( " kamusiFormat is: ")
+    println( kamusiFormat )
+
     FatashiWork.work()      // do the work of Fatashi
 
     printInfo("...ending ${MyEnvironment.appName}")  // say good-bye to user
 }
+
+
+
 
 object FatashiWork  {
         // instantiate kamusi
