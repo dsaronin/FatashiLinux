@@ -1,5 +1,5 @@
 {
-  "filename": "tempdict.txt",
+  "filename": "data/tempdict.txt",
   "kamusiType": "kamusi",
   "kamusiLang": "kiswahili",
   "fieldDelimiters": "(\\\\s+--\\\\s+)|(\\t__[ \\t\\\\x0B\\\\f]+)",

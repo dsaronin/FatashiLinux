@@ -18,12 +18,8 @@ const val CONFIG_PROPERTIES_FILE ="config.properties"
 
 private const val WORK_FILE             = "data/tempdict.txt"
 private const val PRODUCTION_FILE       = "data/dsa_dictionary.txt"
-private const val KAMUSI_STANDARD_FILE  = "data/tuki_kamusi.txt"
-private const val METHALI_STANDARD_FILE = "data/methali_kamusi.txt"
 
 private const val MAIN_FIELD_DELIMITERS = "(\\s+--\\s+)|(\t__[ \t\\x0B\\f]+)"
-private const val STD_FIELD_DELIMITERS  = "(\\s+--\\s+)|(\t__[ \t\\x0B\\f]+)"
-private const val METH_FIELD_DELIMITERS = "(\\s+--\\s+)|(\t__[ \t\\x0B\\f]+)"
 
 // patterns for wrapping a search string to constrain it to a given dictionary field
 // KEY and USAGE fields, coming at head or tail, each have two parts;
@@ -43,14 +39,6 @@ private const val ANCHOR_TAIL = '$'     // pattern anchor for tail of FIELD_USG
 // DEFAULTS for ARG line options
 private const val LIST_LINE_COUNT = 20
 
-/*****
- * How to read ENVIRONMENT variables
- *   val env: MutableMap<String, String> = System.getenv()
- *   println("Path: ${env["OS"]}")
- *   OR
- *   val me = System.getenv("LOGNAME")
- *****/
-
 object MyEnvironment {
         // appProps will be properties read in from config.properties
     private val appProps = Properties()
@@ -67,10 +55,10 @@ object MyEnvironment {
 
     // set defaults; modifiable by external properties or command line
     var appName = APP_NAME
+    var  anchorHead       = ANCHOR_HEAD
+    var  anchorTail       = ANCHOR_TAIL
 
     var fieldDelimsMain   = MAIN_FIELD_DELIMITERS
-    var fieldDelimsStd    = STD_FIELD_DELIMITERS
-    var fieldDelimsMeth   = METH_FIELD_DELIMITERS
 
     var  fieldKeyHead     = FIELD_KEY_HEAD
     var  fieldKeyTail     = FIELD_KEY_TAIL
@@ -78,15 +66,11 @@ object MyEnvironment {
     var  fieldDefTail     = FIELD_DEF_TAIL
     var  fieldUsgHead     = FIELD_USG_HEAD
     var  fieldUsgTail     = FIELD_USG_TAIL
-    var  anchorHead       = ANCHOR_HEAD
-    var  anchorTail       = ANCHOR_TAIL
 
     var workFile        = WORK_FILE
     var productionFile  = PRODUCTION_FILE
 
     var kamusiMainFile      = if( prodFlag ) PRODUCTION_FILE else WORK_FILE
-    var kamusiStdFile       = KAMUSI_STANDARD_FILE
-    var methaliStdFile      = METHALI_STANDARD_FILE
 
     // **************************************************************************
     // **************************************************************************
@@ -119,12 +103,7 @@ object MyEnvironment {
         productionFile    = appProps.getProperty("PRODUCTION_FILE") ?: PRODUCTION_FILE
         workFile          = appProps.getProperty("WORK_FILE") ?: WORK_FILE
 
-        kamusiStdFile     = appProps.getProperty("KAMUSI_STANDARD_FILE") ?: KAMUSI_STANDARD_FILE
-        methaliStdFile    = appProps.getProperty("METHALI_STANDARD_FILE") ?: METHALI_STANDARD_FILE
-
         fieldDelimsMain  = appProps.getProperty("MAIN_FIELD_DELIMITERS") ?: MAIN_FIELD_DELIMITERS
-        fieldDelimsStd   = appProps.getProperty("STD_FIELD_DELIMITERS") ?: STD_FIELD_DELIMITERS
-        fieldDelimsMeth  = appProps.getProperty("METH_FIELD_DELIMITERS") ?: METH_FIELD_DELIMITERS
 
         fieldKeyHead     = appProps.getProperty("FIELD_KEY_HEAD") ?: FIELD_KEY_HEAD
         fieldKeyTail     = appProps.getProperty("FIELD_KEY_TAIL") ?: FIELD_KEY_TAIL
@@ -132,8 +111,6 @@ object MyEnvironment {
         fieldDefTail     = appProps.getProperty("FIELD_DEF_TAIL") ?: FIELD_DEF_TAIL
         fieldUsgHead     = appProps.getProperty("FIELD_USG_HEAD") ?: FIELD_USG_HEAD
         fieldUsgTail     = appProps.getProperty("FIELD_USG_TAIL") ?: FIELD_USG_TAIL
-        anchorHead       = appProps.getProperty("ANCHOR_HEAD")?.first() ?: ANCHOR_HEAD
-        anchorTail       = appProps.getProperty("ANCHOR_TAIL")?.first() ?: ANCHOR_TAIL
 
     }
 
@@ -155,7 +132,7 @@ object MyEnvironment {
     private val flag_regex = Regex("""--?(\w\b|\w+)""")
 
     // parseArgList -- parse the command line argument option flags
-    // ex: -v -n 5 -d --version --kamusi1 "dsa_dictionary.txt" --kamusi2 "tuki_kamusi.txt" --methali "methali_kamusi.txt"
+    // ex: -v -n 5 -d --version --kamusi1 "dsa_dictionary.txt"
     fun parseArgList(args: Array<String>) {
         if( args.isEmpty() ) return
 
@@ -187,8 +164,8 @@ object MyEnvironment {
                     "h", "help"     -> printHelp()
                     "version" -> Version.printMyVersion( " " )
                     "kamusi1"  -> kamusiMainFile = popFileNameOrDefault(lifo, productionFile )
-                    "kamusi2"  -> kamusiStdFile = popFileNameOrDefault(lifo,KAMUSI_STANDARD_FILE)
-                    "methali1" -> methaliStdFile = popFileNameOrDefault(lifo,METHALI_STANDARD_FILE)
+//                    "kamusi2"  -> kamusiStdFile = popFileNameOrDefault(lifo,KAMUSI_STANDARD_FILE)
+//                    "methali1" -> methaliStdFile = popFileNameOrDefault(lifo,METHALI_STANDARD_FILE)
 
                     else -> printArgUsageError("unknown flag: $flag")
                 }
@@ -220,13 +197,13 @@ object MyEnvironment {
 
     // printOptions -- display the current state of options
     fun printOptions() {
-        val optionList = "  verbose (%c), debug (%c), prod (%c) list n(%d), main (%s), tuki (%s), methali (%s)"
+        val optionList = "  verbose (%c), debug (%c), prod (%c) list n(%d), main (%s)"
 
         printInfo(
                 optionList.format(
                         verboseFlag.toChar(), debugFlag.toChar(), prodFlag.toChar(),
                         listLineCount,
-                        kamusiMainFile, kamusiStdFile, methaliStdFile
+                        kamusiMainFile
                 )
         )
 
