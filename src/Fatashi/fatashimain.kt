@@ -18,7 +18,7 @@ fun main(args: Array<String>) {
     Version.printMyVersion( " starting..." )
     MyEnvironment.setup(args)   // initialize app environment
 
-    val kamusiFormat = readJsonKamusiFormats("data/tempdict.json")
+    val kamusiFormat = KamusiFormat.readJsonKamusiFormats("data/tempdict.json")
     println( " kamusiFormat is: ")
     println( kamusiFormat )
 
