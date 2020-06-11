@@ -26,13 +26,13 @@ object MyEnvironment {
     val myProps = ConfigProperties.readJsonConfigurations( CONFIG_PROPERTIES_FILE )
     val anchorHead       = ANCHOR_HEAD
     val anchorTail       = ANCHOR_TAIL
-    lateinit var kamusiHead:  List<Kamusi>
-    lateinit var methaliHead: List<Kamusi>
-    lateinit var testHead:    List<Kamusi>
+    var kamusiHead:  Stack<Kamusi> = mutableListOf<Kamusi>()
+    var methaliHead: Stack<Kamusi> = mutableListOf<Kamusi>()
+    var testHead:    Stack<Kamusi> = mutableListOf<Kamusi>()
 
-    lateinit var kamusiFormatList: List<KamusiFormat>
-    lateinit var methaliFormatList: List<KamusiFormat>
-    lateinit var testFormatList: List<KamusiFormat>
+    var kamusiFormatList: Stack<KamusiFormat> = mutableListOf<KamusiFormat>()
+    var methaliFormatList: Stack<KamusiFormat> = mutableListOf<KamusiFormat>()
+    var testFormatList: Stack<KamusiFormat> = mutableListOf<KamusiFormat>()
 
     // **************************************************************************
     // **************************************************************************
@@ -193,6 +193,10 @@ object MyEnvironment {
 
     private fun printArgUsageError(s: String) {
         printUsageError("Command line arg input error: $s")
+    }
+
+    fun printWarnIfDebug(s: String) {
+        if( myProps.debugFlag ) printWarn(s)
     }
 
 }

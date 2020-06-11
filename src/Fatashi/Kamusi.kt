@@ -52,6 +52,7 @@ class Kamusi( val myKamusiFormat: KamusiFormat )  {
     init {
             // open file
         val kamusiFile = File(myKamusiFormat.filename)
+        MyEnvironment.printWarnIfDebug("Opening Kamusi: $kamusiFile")
             // make regex pattern for replacing with std field delimiters
         fieldDelimiter = Regex( myKamusiFormat.fieldDelimiters )
             // read entire dict, replace all field delims with tab
@@ -70,7 +71,7 @@ companion object {
     
     // kamusiSetup -- recursively set up a list of kamusi's
     // return null if no more in list; else return the kamusi set up
-    fun kamusiSetup( kfList: MutableList<KamusiFormat> ): Kamusi? {
+    fun kamusiSetup( kfList: Stack<KamusiFormat> ): Kamusi? {
         
         val myFormat = kfList.pop() ?: return null  // end recursion at list end
         
