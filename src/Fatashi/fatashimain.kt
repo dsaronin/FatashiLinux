@@ -30,26 +30,39 @@ object FatashiWork  {
     // fatashi work loops through commands
     fun work(  ) {
         var loop = true  // user input loop while true
+        var useKamusi: Kamusi?
 
         do {
             printPrompt("${MyEnvironment.myProps.appName} > ")  // command prompt
             val cmdlist = readLine()?.trim()?.split(' ') ?: listOf("exit")
 
+            useKamusi = null    // assume this isn't a search command
+
                 // parse command
             when ( val cmd = cmdlist.first().trim() ) {
                 "x", "ex", "exit"       -> loop = false   // exit program
                 "q", "quit"             -> loop = false  // exit program
-                "t", "tft", "tafuta",
-                "m", "methali"     -> kamusi.searchKeyList( cmdlist.drop(1) )  // search dictionary
-                "l", "list"       -> kamusi.listAll()   // list dictionary
-                "f", "flags"      -> MyEnvironment.printOptions()  // list options
-                "s", "sts", "stat", "status"       -> kamusi.printStatus()   // dict status
+                // search dictionary OR methali
+                "t", "ta", "tafuta"    ->
+                    useKamusi = if (MyEnvironment.myProps.prodFlag)
+                                     MyEnvironment.kamusiHead
+                                else MyEnvironment.testHead
+                "m", "ma", "methali"   -> useKamusi = MyEnvironment.methaliHead
+
+                "l", "list"          -> MyEnvironment.kamusiHead?.listAll()   // list dictionary
+                "s", "sts", "status" -> MyEnvironment.kamusiHead?.printStatus()   // dict status
+
+                "f", "flags"     -> MyEnvironment.printOptions()  // list options
                 "h", "help"      -> MyEnvironment.printInfo(helpList)
                 "v", "version"   -> Version.printMyVersion( " " )
-                "o", "optioins"  -> MyEnvironment.printOptions()
+                "o", "options"   -> MyEnvironment.printOptions()
+
                 ""               -> loop = true   // empty line; NOP
                 else        -> MyEnvironment.printUsageError("$cmd is unrecognizable")
             }
+
+                // useKamusi will be non-null if a search command was encountered
+            useKamusi?.searchKeyList( cmdlist.drop(1) )   // do the search on key item list
 
         } while ( loop )
     }

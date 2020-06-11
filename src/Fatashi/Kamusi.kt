@@ -1,6 +1,7 @@
 package Fatashi
 
 import java.io.File
+// copyright
 
 /***************************************************************************************
  *     explanation for itemRegex (below): syntax for "commands" to kamusi parser
@@ -82,7 +83,7 @@ companion object {
 
         return myKamusi   // return myself
     }
-}
+} // end companion
 
 //************************************************************************************
 //****** utility methods         *****************************************************
