@@ -1,0 +1,31 @@
+private const val WORK_FILE             = "data/tempdict.txt"
+private const val PRODUCTION_FILE       = "data/dsa_dictionary.txt"
+
+private const val MAIN_FIELD_DELIMITERS = "(\\s+--\\s+)|(\t__[ \t\\x0B\\f]+)"
+
+// patterns for wrapping a search string to constrain it to a given dictionary field
+// KEY and USAGE fields, coming at head or tail, each have two parts;
+// the KEY_HEAD might not be required if the search pattern begins with "^", to anchor at BOL
+// the USG_TAIL might not be required if the search pattern ends with "$", to anchor at EOL
+// for consistency, FIELD_DEF also has HEAD and TAIL
+
+private const val FIELD_KEY_HEAD = """^[^\t]*"""  // item KEY is first field before TAB
+private const val FIELD_KEY_TAIL = """[^\t]*\t"""  // item KEY is first field before TAB
+private const val FIELD_DEF_HEAD = """^[^\t]+\t[^\t]*"""  // item DEFINITION is second field between two tabs
+private const val FIELD_DEF_TAIL = """[^\t]*\t"""  // item DEFINITION is second field between two tabs
+private const val FIELD_USG_HEAD = """^[^\t]+\t[^\t]+\t[^\t]*"""  // item USAGE is third field, prior to EOL
+private const val FIELD_USG_TAIL = """[^\t]*$"""  // item USAGE is third field, prior to EOL
+
+
+============================================
+// properties required:
+//   _kamusi_file: String,  // filename for raw dictionary
+//   _field_delimiters: String,  // regex pattern to find main fields
+//   _internal_fields: String = "\t",  // internal field delimiter defaults to tab
+//   _record_delimiter: String  = "\n"    // dict record delimiter defaults to newline
+
+        _kamusi_file: String,  // file object for raw dictionary
+        _field_delimiters: String,  // regex pattern to find main fields
+        _internal_fields: String = "\t",  // internal field delimiter
+        _record_delimiter: String = "\n"    // dict record delimiter
+

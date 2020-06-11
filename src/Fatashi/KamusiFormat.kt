@@ -39,8 +39,8 @@ companion object {
 
     fun readJsonKamusiFormats(f: String) : KamusiFormat {
         val kamusiFormat : KamusiFormat
-        val gson = Gson()
         val kamusiFormatType = object : TypeToken<KamusiFormat>() {}.type
+        val gson = Gson()
 
         try {
             kamusiFormat = gson.fromJson( File(f).readText(), kamusiFormatType)

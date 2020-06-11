@@ -1,0 +1,71 @@
+private val appProps = Properties()
+
+    // loadAndSetProperties  -- grab external configuration parameters & set
+    fun loadAndSetProperties() {
+        appProps.load( FileInputStream(CONFIG_PROPERTIES_FILE) )
+
+        productionFile    = appProps.getProperty("PRODUCTION_FILE") ?: PRODUCTION_FILE
+        workFile          = appProps.getProperty("WORK_FILE") ?: WORK_FILE
+
+        fieldDelimsMain  = appProps.getProperty("MAIN_FIELD_DELIMITERS") ?: MAIN_FIELD_DELIMITERS
+
+        fieldKeyHead     = appProps.getProperty("FIELD_KEY_HEAD") ?: FIELD_KEY_HEAD
+        fieldKeyTail     = appProps.getProperty("FIELD_KEY_TAIL") ?: FIELD_KEY_TAIL
+        fieldDefHead     = appProps.getProperty("FIELD_DEF_HEAD") ?: FIELD_DEF_HEAD
+        fieldDefTail     = appProps.getProperty("FIELD_DEF_TAIL") ?: FIELD_DEF_TAIL
+        fieldUsgHead     = appProps.getProperty("FIELD_USG_HEAD") ?: FIELD_USG_HEAD
+        fieldUsgTail     = appProps.getProperty("FIELD_USG_TAIL") ?: FIELD_USG_TAIL
+
+    }
+
+        // listProperties -- list the config_properties.json file as seen by kotlin
+        fun printProperties() {
+            val propkeys = mutableListOf<String>()
+
+            for (key in appProps.propertyNames()) {
+                propkeys.add( key.toString() )
+            }
+
+            println("config property values: ")
+            for ( key in propkeys.sortedBy {it.toLowerCase()}) {
+                println("$key: >|${appProps[key]}|<")
+            }
+        }
+
+***************************************
+config.properties format
+***************************************
+## configuration parameters for Fatashi
+
+## WORK_FILE             = data/tempdict.txt
+## PRODUCTION_FILE       = data/dsa_dictionary.txt
+
+## KAMUSI_STANDARD_FILE  = data/tuki_kamusi.txt
+## METHALI_STANDARD_FILE = data/methali_kamusi.txt
+
+## MAIN_FIELD_DELIMITERS = (\\s+--\\s+)|(\\t__[ \\t\\x0B\\f]+)
+## STD_FIELD_DELIMITERS  = (\\s+--\\s+)|(\\t__[ \\t\\x0B\\f]+)
+## METH_FIELD_DELIMITERS = (\\s+--\\s+)|(\\t__[ \\t\\x0B\\f]+)
+
+## configuration parameters for Dictionary
+## patterns for wrapping a search string to constrain it to a given dictionary field
+## KEY and USAGE fields, coming at head or tail, each have two parts;
+## the KEY_HEAD might not be required if the search pattern begins with "^", to anchor at BOL
+## the USG_TAIL might not be required if the search pattern ends with "$", to anchor at EOL
+## for consistency, FIELD_DEF also has HEAD and TAIL
+
+## item KEY is first field before TAB
+## FIELD_KEY_HEAD = ^.*
+## FIELD_KEY_TAIL = .*\\t
+
+## item DEFINITION is second field between two tabs
+## FIELD_DEF_HEAD = ^.*\\t.*
+## FIELD_DEF_TAIL = .*\\t
+
+## item USAGE is third field, prior to EOL
+## FIELD_USG_HEAD = ^.*\\t.*\\t.*
+## FIELD_USG_TAIL = .*$
+
+## Anchors for BOL and EOL regex symbols
+## ANCHOR_HEAD = ^
+## ANCHOR_TAIL = $
