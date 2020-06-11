@@ -1,7 +1,5 @@
 package Fatashi
 
-
-
 // Fatashi -- a dictionary search & display package
 
 // global expressions for output
@@ -18,29 +16,15 @@ fun main(args: Array<String>) {
     Version.printMyVersion( " starting..." )
     MyEnvironment.setup(args)   // initialize app environment
 
-//    val kamusiFormat = KamusiFormat.readJsonKamusiFormats("data/tempdict.json")
-//    println( " kamusiFormat is: ")
-//    println( kamusiFormat )
-
     FatashiWork.work()      // do the work of Fatashi
 
-    printInfo("...ending ${MyEnvironment.appName}")  // say good-bye to user
+    printInfo("...ending ${MyEnvironment.myProps.appName}")  // say good-bye to user
 }
 
 
 
 
 object FatashiWork  {
-        // instantiate kamusi
-    private val kamusi = Kamusi(
-                MyEnvironment.kamusiMainFile,
-                MyEnvironment.fieldDelimsMain
-        )
-
-    init {
-        // show that dictionary is viable & ready
-        if ( MyEnvironment.verboseFlag ) kamusi.printStatus()
-    }
 
     private val helpList = "  tafuta, methali, list, sts, options, help, quit, exit"
     // fatashi work loops through commands
@@ -48,7 +32,7 @@ object FatashiWork  {
         var loop = true  // user input loop while true
 
         do {
-            printPrompt("${MyEnvironment.appName} > ")  // command prompt
+            printPrompt("${MyEnvironment.myProps.appName} > ")  // command prompt
             val cmdlist = readLine()?.trim()?.split(' ') ?: listOf("exit")
 
                 // parse command

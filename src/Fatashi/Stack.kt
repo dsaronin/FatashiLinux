@@ -6,6 +6,9 @@ package Fatashi
  */
 typealias Stack<T> = MutableList<T>
 
+// empty constructor for Stack
+fun <T> stackOf(): MutableList<T> = mutableListOf()
+
 /**
  * Pushes item to [Stack]
  * @param item Item to be pushed
@@ -23,3 +26,4 @@ fun <T> Stack<T>.pop(): T? = if (isNotEmpty()) removeAt(lastIndex) else null
  * @return item Last item if [Stack] is not empty, null otherwise
  */
 fun <T> Stack<T>.peek(): T? = if (isNotEmpty()) this[lastIndex] else null
+

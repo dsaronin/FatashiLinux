@@ -29,3 +29,21 @@ private const val FIELD_USG_TAIL = """[^\t]*$"""  // item USAGE is third field, 
         _internal_fields: String = "\t",  // internal field delimiter
         _record_delimiter: String = "\n"    // dict record delimiter
 
+======================================
+//    val kamusiFormat = KamusiFormat.readJsonKamusiFormats("data/tempdict.json")
+//    println( " kamusiFormat is: ")
+//    println( kamusiFormat )
+
+============
+        // instantiate kamusi
+    private val kamusi = Kamusi(
+                MyEnvironment.kamusiMainFile,
+                MyEnvironment.fieldDelimsMain
+        )
+==============
+    init {
+        // show that dictionary is viable & ready
+        if ( MyEnvironment.myProps.verboseFlag ) kamusi.printStatus()
+    }
+
+=================

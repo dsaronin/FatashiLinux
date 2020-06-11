@@ -1,8 +1,6 @@
 package Fatashi
 
 import java.io.File
-import java.io.FileInputStream
-import java.util.*
 
 fun Boolean.toChar() = this.toString().first()
 
@@ -26,13 +24,13 @@ object MyEnvironment {
     val myProps = ConfigProperties.readJsonConfigurations( CONFIG_PROPERTIES_FILE )
     val anchorHead       = ANCHOR_HEAD
     val anchorTail       = ANCHOR_TAIL
-    var kamusiHead:  Stack<Kamusi> = mutableListOf<Kamusi>()
-    var methaliHead: Stack<Kamusi> = mutableListOf<Kamusi>()
-    var testHead:    Stack<Kamusi> = mutableListOf<Kamusi>()
+    var kamusiHead:  Kamusi? = null
+    var methaliHead: Kamusi? = null
+    var testHead:    Kamusi? = null
 
-    var kamusiFormatList: Stack<KamusiFormat> = mutableListOf<KamusiFormat>()
-    var methaliFormatList: Stack<KamusiFormat> = mutableListOf<KamusiFormat>()
-    var testFormatList: Stack<KamusiFormat> = mutableListOf<KamusiFormat>()
+    private var kamusiFormatList: Stack<KamusiFormat> = mutableListOf<KamusiFormat>()
+    private var methaliFormatList: Stack<KamusiFormat> = mutableListOf<KamusiFormat>()
+    private var testFormatList: Stack<KamusiFormat> = mutableListOf<KamusiFormat>()
 
     // **************************************************************************
     // **************************************************************************
@@ -45,10 +43,15 @@ object MyEnvironment {
         if (myProps.verboseFlag) printOptions()
 
         // get the various KamusiFormat files for each kamusi
+        KamusiFormat.kamusiFormatSetup(myProps.kamusiList, kamusiFormatList)
+        KamusiFormat.kamusiFormatSetup(myProps.methaliList, methaliFormatList)
+        KamusiFormat.kamusiFormatSetup(myProps.testList, testFormatList)
 
         // process the KamusiFormat files to create kamusi objects
+        kamusiHead = Kamusi.kamusiSetup( kamusiFormatList )
+        methaliHead = Kamusi.kamusiSetup( methaliFormatList )
+        testHead = Kamusi.kamusiSetup( testFormatList )
     }
-
 
 
     // regex recognizer for short/long flags and extracts the flag w/o punctuation
@@ -59,14 +62,14 @@ object MyEnvironment {
     fun parseArgList(args: Array<String>) {
         if( args.isEmpty() ) return
 
-        val lifo = Stack<String>()
+        val lifo = stackOf<String>()
 
         // build from args LIFO stack in reverse (right-to-left) for top-down parsing
         for( i in args.indices.reversed() ) lifo.push( args[i] )
 
         // now parse stack (LIFO == args left-to-right)
-        while( !lifo.isEmpty() ) {
-            val flagArg = lifo.pop()
+        while(lifo.isNotEmpty()) {
+            val flagArg = lifo.pop() ?: ""
 
             val matches = flag_regex.findAll( flagArg )  // recognize & extract
             val m=matches.firstOrNull()
@@ -75,7 +78,7 @@ object MyEnvironment {
             }
             else {
                 // extract the flag (it will be in either of the two groupings, but not both
-                val flag = if( !m.groupValues[1].isEmpty() ) m.groupValues[1] else m.groupValues[2]
+                val flag = if(m.groupValues[1].isNotEmpty()) m.groupValues[1] else m.groupValues[2]
 
                 // flag is now the extracted flag
                 // println("extracted flag is: $flag")
