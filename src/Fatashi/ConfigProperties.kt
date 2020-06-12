@@ -19,6 +19,11 @@ class ConfigProperties(
         var methaliList: Stack<String> = mutableListOf<String>(),  // ordered filenames for methali dicts
         var testList:    Stack<String> = mutableListOf<String>()   // ordered filenames for test dicts
 ) {
+    init {
+        // force sanity on some values
+        if (listLineCount <= 0) listLineCount = LIST_LINE_COUNT
+        if (appName.isBlank()) appName = APP_NAME
+    }
     companion object {
 
         fun readJsonConfigurations(f: String): ConfigProperties {

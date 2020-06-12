@@ -47,3 +47,7 @@ private const val FIELD_USG_TAIL = """[^\t]*$"""  // item USAGE is third field, 
     }
 
 =================
+        dictionary.forEach {
+            println( it )
+        }
+===================

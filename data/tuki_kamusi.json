@@ -2,7 +2,7 @@
   "filename": "data/tuki_kamusi.txt",
   "kamusiType": "kamusi",
   "kamusiLang": "kiswahili",
-  "fieldDelimiters": "\\\\s+\\[\\]\\t",
+  "fieldDelimiters": "\\s+\\[]\\t",
   "wrapKeyHead":  "^[^\\t]*",
   "wrapKeyTail":  "[^\\t]*\\t",
   "wrapDefHead":  "^[^\\t]+\\t[^\\t]*",

@@ -94,11 +94,15 @@ companion object {
         printInfo( "  ${myKamusiFormat.filename} has ${dictionary.count()} entries")
     }
 
-    // listAll -- output entire dictionary internal representation
+    // listAll -- output a random page of dictionary internal representation
     fun listAll() {
-        dictionary.forEach {
-            println( it )
-        }
+        val totalPages: Int = dictionary.count() / MyEnvironment.myProps.listLineCount
+        val startPage: Int = (1..totalPages).random()
+        val startPageIndex = (startPage-1) * MyEnvironment.myProps.listLineCount
+
+        printInfo( "Page $startPage from ${myKamusiFormat.filename}:")
+        for (idx in (startPageIndex until startPageIndex+MyEnvironment.myProps.listLineCount))
+            println( dictionary[idx] )
     }
 
 

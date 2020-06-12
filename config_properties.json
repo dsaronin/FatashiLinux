@@ -3,8 +3,8 @@
   "listLineCount": 25,
   "verboseFlag": false,
   "debugFlag": false,
-  "prodFlag": true,
-  "kamusiList": ["data/dsa_dictionary.txt", "data/tuki_kamusi.txt"],
-  "methaliList": ["data/methali_kamusi.txt"],
-  "testList": ["data/tempdict.txt"]
+  "prodFlag": false,
+  "kamusiList": ["data/dsa_dictionary.json", "data/tuki_kamusi.json"],
+  "methaliList": ["data/methali_kamusi.json"],
+  "testList": ["data/tempdict.json"]
 }

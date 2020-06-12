@@ -45,11 +45,12 @@ companion object {
     fun kamusiFormatSetup(fnList: Stack<String>, fkList: Stack<KamusiFormat> ) {
         val fn = fnList.pop() ?: return  // pop an element; unless end of list, return
 
-        kamusiFormatSetup( fnList, fkList )  // recurse if more in list
         if( fn.isNotEmpty() )  {  // only handle nonEmpty filenames
                 // push to result list our KamusiFormat
             fkList.push( readJsonKamusiFormats( fn ) )
         }
+        kamusiFormatSetup( fnList, fkList )  // recurse if more in list
+
         // fall thru to return
     }
 
@@ -65,6 +66,7 @@ companion object {
 
         try {
             kamusiFormat = gson.fromJson( File(f).readText(), kamusiFormatType)
+            MyEnvironment.printWarnIfDebug("$kamusiFormat")
         }
         catch(ex: NumberFormatException){
             println(ex)

@@ -2,7 +2,7 @@
   "filename": "data/methali_kamusi.txt",
   "kamusiType": "methali",
   "kamusiLang": "kiswahili",
-  "fieldDelimiters": "\\\\s+\\t\\s*",
+  "fieldDelimiters": "\\s+\\t\\s*",
   "wrapKeyHead":  "^[^\\t]*",
   "wrapKeyTail":  "[^\\t]*\\t",
   "wrapDefHead":  "^[^\\t]+\\t[^\\t]*",
