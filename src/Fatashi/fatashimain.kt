@@ -43,15 +43,17 @@ object FatashiWork  {
                 "x", "ex", "exit"       -> loop = false   // exit program
                 "q", "quit"             -> loop = false  // exit program
                 // search dictionary OR methali
-                "t", "ta", "tafuta"    ->
+                "t", "tafuta"    ->
                     useKamusi = if (MyEnvironment.myProps.prodFlag)
                                      MyEnvironment.kamusiHead
                                 else MyEnvironment.testHead
-                "m", "ma", "methali"   -> useKamusi = MyEnvironment.methaliHead
+                "tt"             -> useKamusi = MyEnvironment.kamusiHead?.nextKamusi
+                "m", "methali"   -> useKamusi = MyEnvironment.methaliHead
 
                 "ml"                 -> MyEnvironment.methaliHead?.listAll()
                 "ms"                 -> MyEnvironment.methaliHead?.printStatus()   // dict status
                 "l", "list"          -> MyEnvironment.kamusiHead?.listAll()   // list dictionary
+                "lt"                 -> MyEnvironment.kamusiHead?.nextKamusi?.listAll()
                 "s", "sts", "status" -> MyEnvironment.kamusiHead?.printStatus()   // dict status
 
                 "f", "flags"     -> MyEnvironment.printOptions()  // list options

@@ -21,17 +21,17 @@ class ConfigProperties(
 ) {
     init {
         // force sanity on some values
-        if (listLineCount <= 0) listLineCount = LIST_LINE_COUNT
+        if (listLineCount <= 3) listLineCount = LIST_LINE_COUNT
         if (appName.isBlank()) appName = APP_NAME
     }
     companion object {
 
-        fun readJsonConfigurations(f: String): ConfigProperties {
+        fun readJsonConfigurations(f: String, v: Boolean = false): ConfigProperties {
             val myProperties: ConfigProperties
             val myPropertiesType = object : TypeToken<ConfigProperties>() {}.type
             val gson = Gson()
 
-            printWarn("Reading ConfigProperties file: $f")
+            if (v) printWarn("Reading ConfigProperties file: $f")
 
             try {
                 myProperties = gson.fromJson(File(f).readText(), myPropertiesType)

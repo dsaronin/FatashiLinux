@@ -35,7 +35,7 @@ import java.io.File
 // requires a KamusiFormat object with kamusi-specific parameters
 data class Kamusi( val myKamusiFormat: KamusiFormat )  {
 
-    private var nextKamusi: Kamusi? = null  // next in chain of kamusi's
+    var nextKamusi: Kamusi? = null  // next in chain of kamusi's
     private val dictionary: List<String>    // kamusi data
 
     private val fieldDelimiter: Regex   // used to massage field delimiters to a standard
