@@ -33,7 +33,7 @@ import java.io.File
 
 // Dictionary handles everything re dictionary database, but has no language-specific logic
 // requires a KamusiFormat object with kamusi-specific parameters
-class Kamusi( val myKamusiFormat: KamusiFormat )  {
+data class Kamusi( val myKamusiFormat: KamusiFormat )  {
 
     private var nextKamusi: Kamusi? = null  // next in chain of kamusi's
     private val dictionary: List<String>    // kamusi data
@@ -75,7 +75,7 @@ companion object {
     fun kamusiSetup( kfList: Stack<KamusiFormat> ): Kamusi? {
         
         val myFormat = kfList.pop() ?: return null  // end recursion at list end
-        
+
         val myKamusi = Kamusi( myFormat )  // load and setup this kamusi
 
             // setup remainder of list returning my child kamusi
@@ -166,7 +166,8 @@ companion object {
         val itemRegex = pattern.toRegex(RegexOption.IGNORE_CASE)  // convert key to regex
 
         // filter dictionary grabbing only records with a match
-        val resList = dictionary.filter { itemRegex.containsMatchIn(it) }
+        val resList = getResults(itemRegex )  // start with this dictionary and follow chain
+
         printResults(
                 if( constraint.isEmpty() ) resList else {
                     val conregex = constraint.toRegex(RegexOption.IGNORE_CASE)
@@ -174,6 +175,20 @@ companion object {
                 },
                 item.toRegex(RegexOption.IGNORE_CASE)
         )  // display results, if any found
+    }
+
+    // getResults  -- RECURSIVELY check all dictionaries in list until results found
+    private fun getResults( itemRegex: Regex ): List<String> {
+        var resList: List<String>
+
+            // try this dictionary first
+        resList = dictionary.filter { itemRegex.containsMatchIn(it) }
+                // if nothing found and there's still a dictionary to be checked...
+            if( resList.isEmpty() && nextKamusi != null ) {
+                    // search in it for a result
+                resList = nextKamusi!!.getResults( itemRegex )
+            }
+        return resList  // return whatever we've found, possibly empty
     }
 
     // printResults  -- handles all output for found items
