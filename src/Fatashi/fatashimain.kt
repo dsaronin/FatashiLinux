@@ -49,6 +49,8 @@ object FatashiWork  {
                                 else MyEnvironment.testHead
                 "m", "ma", "methali"   -> useKamusi = MyEnvironment.methaliHead
 
+                "ml"                 -> MyEnvironment.methaliHead?.listAll()
+                "ms"                 -> MyEnvironment.methaliHead?.printStatus()   // dict status
                 "l", "list"          -> MyEnvironment.kamusiHead?.listAll()   // list dictionary
                 "s", "sts", "status" -> MyEnvironment.kamusiHead?.printStatus()   // dict status
 
