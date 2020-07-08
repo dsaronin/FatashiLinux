@@ -1,6 +1,7 @@
 package Fatashi
 
 // Fatashi -- a dictionary search & display package
+    private const val DEBUG  = false
 
 // global expressions for output
  fun printInfo(s: String)   = println( AnsiColor.wrapCyan( s ) )
@@ -31,12 +32,14 @@ object FatashiWork  {
     fun work(  ) {
         var loop = true  // user input loop while true
         var useKamusi: Kamusi?
+        var dropCount: Int
 
         do {
             printPrompt("${MyEnvironment.myProps.appName} > ")  // command prompt
             val cmdlist = readLine()?.trim()?.split(' ') ?: listOf("exit")
 
             useKamusi = null    // assume this isn't a search command
+            dropCount = 1       // assume need to drop cmd from list head
 
                 // parse command
             when ( val cmd = cmdlist.first().trim() ) {
@@ -62,11 +65,15 @@ object FatashiWork  {
                 "o", "options"   -> MyEnvironment.printOptions()
 
                 ""               -> loop = true   // empty line; NOP
-                else        -> MyEnvironment.printUsageError("$cmd is unrecognizable")
+                else        -> {  // treat it as tafuta lookup request
+                    useKamusi = MyEnvironment.kamusiHead
+                    dropCount = 0  // don't strip off a command
+                    if (DEBUG) MyEnvironment.printUsageError("$cmd is unrecognizable")
+                }
             }
 
                 // useKamusi will be non-null if a search command was encountered
-            useKamusi?.searchKeyList( cmdlist.drop(1) )   // do the search on key item list
+            useKamusi?.searchKeyList( cmdlist.drop(dropCount) )   // do the search on key item list
 
         } while ( loop )
     }
