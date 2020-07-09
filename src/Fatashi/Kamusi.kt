@@ -110,16 +110,16 @@ companion object {
         printInfo( "Page $page from ${myKamusiFormat.filename}:")
             // sanity check on endIndex to make sure doesn't exceed number of lines
         var endIndex = index+MyEnvironment.myProps.listLineCount
-        if (endIndex >= dictionary.count()) endIndex = dictionary.count() - endIndex
+        if (endIndex >= dictionary.count()) endIndex = dictionary.count() - 1
 
         for (idx in (index until endIndex)) println( dictionary[idx] )
     }
 
     private fun advanceBrowserPage(): Int {
-        val index = lastBrowseIndex + MyEnvironment.myProps.listLineCount
+        val index = lastBrowseIndex + MyEnvironment.myProps.listLineCount - 1
+        val maxindex = (dictionary.count() - MyEnvironment.myProps.listLineCount)
 
-        return if (index <= (dictionary.count() - MyEnvironment.myProps.listLineCount))
-            index else lastBrowseIndex
+        return if (index <= maxindex) index else maxindex
     }
 
     // browsePage -- output a dictionary page starting at first search key match
@@ -137,29 +137,23 @@ companion object {
     }
 
     // buildPattern -- builds a browse search pattern from the given key
-    // ex: if key is ABCD, then returns: "^[-~](ABCD?|ABC?|AB?|A?)"
+    // ex: if key is ABCD, then returns: "^[-~]?ABCD"
     // this pattern will be used to find the largest possible initial sequence of letters
     private fun buildPattern(key: String): String {
-        var result = "^[-~]?("
-        var sequence: CharSequence = key
-
-        do {
-            result += "$sequence?|"
-            sequence = sequence.dropLast(1)
-        } while (sequence.isNotEmpty())
-
-        return result.dropLast(1).plus(")")
+        return "^[-~]?$key"
     }
 
     // jumpToPage -- find the starting page of entries to match search pattern
     private fun jumpToPage( itemRegex: Regex ): Int {
+        if (MyEnvironment.myProps.verboseFlag) printInfo("Browse key: $itemRegex")
         // try this dictionary
-        return dictionary.indexOfFirst { itemRegex.matches(it) }
+        val index = dictionary.indexOfFirst { itemRegex.containsMatchIn(it) }
         // return whatever we've found, possibly -1: no match
+        if (MyEnvironment.myProps.verboseFlag) printInfo("Browse index: $index")
+        return index
     }
 
-
-    //************************************************************************************
+//************************************************************************************
 //****** search methods         *****************************************************
 //************************************************************************************
 /*

@@ -62,7 +62,9 @@ object FatashiWork  {
                 "l","ll","lll","llll"   -> selectKamusi( cmd.length )?.listRandom()
 
                 // browse from an item
-                "b", "browse"  -> selectKamusi(1)?.browsePage( cmdlist.drop(dropCount) )
+                "browse"  -> selectKamusi(1)?.browsePage( cmdlist.drop(dropCount) )
+                "b","bb","bbb","bbbb"   -> selectKamusi( cmd.length )
+                                            ?.browsePage( cmdlist.drop(dropCount) )
 
                 "s", "sts", "status" -> MyEnvironment.kamusiHead?.printStatus()   // dict status
 
