@@ -6,12 +6,13 @@ import java.io.File
 /***************************************************************************************
  *     explanation for itemRegex (below): syntax for "commands" to kamusi parser
  *     either completely escape the item:
- *     =aaaaaa= escapes item 'aaaaaa' literally to allow inclusion of RegEx operators
+ *     /aaaaaa/ escapes item 'aaaaaa' literally to allow inclusion of RegEx operators
  *
  *     or use following syntax:
  *     ; -- will be used to indicate non-word boundary anchor ( \W )
  *          either prefixing or suffixing the item: ;aaa, aaaa;, or ;aaaa;
  *     : -- future
+ *     ;; - future: anchor to head of line
  *
  *     within the item itself:
  *     prefix - is used in kamusi to show a verb stem
@@ -36,18 +37,19 @@ import java.io.File
 data class Kamusi( val myKamusiFormat: KamusiFormat )  {
 
     var nextKamusi: Kamusi? = null  // next in chain of kamusi's
+    var lastBrowseIndex: Int = 0    // remember our last browse index
     private val dictionary: List<String>    // kamusi data
 
     private val fieldDelimiter: Regex   // used to massage field delimiters to a standard
     private val keyModifiers = "#%&@"  // symbols to constrain searching
+    private val escapeLiteral = "/"    // escapes a search term to force as-is
         // itemRegex below values kamusi search item requests  (see above comments)
-    private val itemRegex = "(^=.+=$|[-~;:]?[\\w'+]+[;:]?)(\\W|[$keyModifiers])?(\\w+)?"
+    private val itemRegex = "(^$escapeLiteral.+$escapeLiteral$|[-~;:]?[\\w'+]+[;:]?)(\\W|[$keyModifiers])?(\\w+)?"
 
     private val internalFields = "\t"    // our standard for field delimiters
     private val recordDelimiter = "\n"   // our standard for record delimiters
     private val showKeyDelim = "\t-- "   // our output standard to delimit fields
     private val spaceReplace = "_"       // underscores in keys are replaced by space
-
 
 // initialize by opening file, reading in raw dict, parsing fields, and splitting into records
     init {
@@ -94,19 +96,70 @@ companion object {
         printInfo( "  ${myKamusiFormat.filename} has ${dictionary.count()} entries")
     }
 
-    // listAll -- output a random page of dictionary internal representation
-    fun listAll() {
+    // listRandom -- output a random page of dictionary internal representation
+    fun listRandom() {
         val totalPages: Int = dictionary.count() / MyEnvironment.myProps.listLineCount
         val startPage: Int = (1..totalPages).random()
         val startPageIndex = (startPage-1) * MyEnvironment.myProps.listLineCount
 
-        printInfo( "Page $startPage from ${myKamusiFormat.filename}:")
-        for (idx in (startPageIndex until startPageIndex+MyEnvironment.myProps.listLineCount))
-            println( dictionary[idx] )
+        listPage(startPage, startPageIndex)
+    }
+
+    // listPage -- output a specific page of the dictionary starting at index
+    private fun listPage( page: Int, index: Int) {
+        printInfo( "Page $page from ${myKamusiFormat.filename}:")
+            // sanity check on endIndex to make sure doesn't exceed number of lines
+        var endIndex = index+MyEnvironment.myProps.listLineCount
+        if (endIndex >= dictionary.count()) endIndex = dictionary.count() - endIndex
+
+        for (idx in (index until endIndex)) println( dictionary[idx] )
+    }
+
+    private fun advanceBrowserPage(): Int {
+        val index = lastBrowseIndex + MyEnvironment.myProps.listLineCount
+
+        return if (index <= (dictionary.count() - MyEnvironment.myProps.listLineCount))
+            index else lastBrowseIndex
+    }
+
+    // browsePage -- output a dictionary page starting at first search key match
+    fun browsePage( keyList: List<String> )  {
+        val index = if (keyList.isEmpty() ) advanceBrowserPage() else {
+            jumpToPage(buildPattern( keyList.first() ).toRegex(RegexOption.IGNORE_CASE))
+        }
+        if (index < 0) {  // key not found
+            printWarn( "Couldn't find any entries starting with: ${keyList.first()}")
+        }
+        else {
+            lastBrowseIndex = index  // remember from where we last searched
+            listPage((index / MyEnvironment.myProps.listLineCount), index)
+        }
+    }
+
+    // buildPattern -- builds a browse search pattern from the given key
+    // ex: if key is ABCD, then returns: "^[-~](ABCD?|ABC?|AB?|A?)"
+    // this pattern will be used to find the largest possible initial sequence of letters
+    private fun buildPattern(key: String): String {
+        var result = "^[-~]?("
+        var sequence: CharSequence = key
+
+        do {
+            result += "$sequence?|"
+            sequence = sequence.dropLast(1)
+        } while (sequence.isNotEmpty())
+
+        return result.dropLast(1).plus(")")
+    }
+
+    // jumpToPage -- find the starting page of entries to match search pattern
+    private fun jumpToPage( itemRegex: Regex ): Int {
+        // try this dictionary
+        return dictionary.indexOfFirst { itemRegex.matches(it) }
+        // return whatever we've found, possibly -1: no match
     }
 
 
-//************************************************************************************
+    //************************************************************************************
 //****** search methods         *****************************************************
 //************************************************************************************
 /*
@@ -220,7 +273,7 @@ companion object {
                 .replace(";".toRegex(), """\\b""")  // non-word boundaries
                 .replace(spaceReplace.toRegex(), " ")     // underscore ==> space
                 .trim()         // lead/trailing spaces
-                .removeSurrounding("=", "=")   // remove literal escape chars
+                .removeSurrounding(escapeLiteral, escapeLiteral)   // remove literal escape chars
     }
 
     // handleByField  -- massage key to constrain the search to a given dict field
