@@ -1,4 +1,4 @@
-package Fatashi
+package org.umoja4life.fatashiBackend
 
 import java.io.File
 // copyright
@@ -34,7 +34,7 @@ import java.io.File
 
 // Dictionary handles everything re dictionary database, but has no language-specific logic
 // requires a KamusiFormat object with kamusi-specific parameters
-data class Kamusi( val myKamusiFormat: KamusiFormat )  {
+data class Kamusi( val myKamusiFormat: KamusiFormat)  {
 
     var nextKamusi: Kamusi? = null  // next in chain of kamusi's
     var lastBrowseIndex: Int = 0    // remember our last browse index
@@ -55,7 +55,7 @@ data class Kamusi( val myKamusiFormat: KamusiFormat )  {
     init {
             // open file
         val kamusiFile = File(myKamusiFormat.filename)
-        MyEnvironment.printWarnIfDebug("Opening Kamusi: $kamusiFile")
+    MyEnvironment.printWarnIfDebug("Opening Kamusi: $kamusiFile")
             // make regex pattern for replacing with std field delimiters
         fieldDelimiter = Regex( myKamusiFormat.fieldDelimiters )
             // read entire dict, replace all field delims with tab
@@ -74,14 +74,14 @@ companion object {
     
     // kamusiSetup -- recursively set up a list of kamusi's
     // return null if no more in list; else return the kamusi set up
-    fun kamusiSetup( kfList: Stack<KamusiFormat> ): Kamusi? {
+    fun kamusiSetup( kfList: Stack<KamusiFormat>): Kamusi? {
         
         val myFormat = kfList.pop() ?: return null  // end recursion at list end
 
-        val myKamusi = Kamusi( myFormat )  // load and setup this kamusi
+        val myKamusi = Kamusi(myFormat)  // load and setup this kamusi
 
             // setup remainder of list returning my child kamusi
-        myKamusi.nextKamusi = kamusiSetup( kfList )  // remember child
+        myKamusi.nextKamusi = kamusiSetup(kfList)  // remember child
 
         return myKamusi   // return myself
     }
@@ -93,7 +93,7 @@ companion object {
 
     // printStatus -- output status of dictionary
     fun printStatus() {
-        printInfo( "  ${myKamusiFormat.filename} has ${dictionary.count()} entries")
+        printInfo("  ${myKamusiFormat.filename} has ${dictionary.count()} entries")
     }
 
     // listRandom -- output a random page of dictionary internal representation
@@ -107,9 +107,9 @@ companion object {
 
     // listPage -- output a specific page of the dictionary starting at index
     private fun listPage( page: Int, index: Int) {
-        printInfo( "Page $page from ${myKamusiFormat.filename}:")
+        printInfo("Page $page from ${myKamusiFormat.filename}:")
             // sanity check on endIndex to make sure doesn't exceed number of lines
-        var endIndex = index+MyEnvironment.myProps.listLineCount
+        var endIndex = index+ MyEnvironment.myProps.listLineCount
         if (endIndex >= dictionary.count()) endIndex = dictionary.count() - 1
 
         for (idx in (index until endIndex)) println( dictionary[idx] )
@@ -128,7 +128,7 @@ companion object {
             jumpToPage(buildPattern( keyList.first() ).toRegex(RegexOption.IGNORE_CASE))
         }
         if (index < 0) {  // key not found
-            printWarn( "Couldn't find any entries starting with: ${keyList.first()}")
+            printWarn("Couldn't find any entries starting with: ${keyList.first()}")
         }
         else {
             lastBrowseIndex = index  // remember from where we last searched
@@ -248,7 +248,7 @@ companion object {
             // output each line after highlighting the found text
             println( it
                     .replace(internalFields, showKeyDelim)
-                    .replace(rex) { AnsiColor.wrapBlueBold( it.groupValues[0] )} )
+                    .replace(rex) { AnsiColor.wrapBlueBold(it.groupValues[0]) } )
         }
         printDivider( "${res.size} results\n")
     }

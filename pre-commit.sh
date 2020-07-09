@@ -8,9 +8,8 @@
 # for example: a projectname -- robin, bluebird, apex, etc; VERSION_COMMENT will persist
 #
 versionfile="VersionData.kt"
-#versionfile="temp.txt"
 projectpath="$HOME/IdeaProjects/FatashiLinux"
-filepath="$projectpath/src/Fatashi/$versionfile"
+filepath="$projectpath/src/org/umoja4life/fatashiBackend/$versionfile"
 
 version_regex='v([0-9]+)\.([0-9]+)\.([0-9]+)'
 git_string=$(git describe --tags)

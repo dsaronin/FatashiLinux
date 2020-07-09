@@ -1,4 +1,4 @@
-package Fatashi
+package org.umoja4life.fatashiBackend
 
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -15,9 +15,9 @@ class ConfigProperties(
         var verboseFlag: Boolean = false,  // true if verbose status information
         var debugFlag: Boolean = false,  // true if debug traces
         var prodFlag: Boolean = false,  // true if production (not test) mode
-        var kamusiList:  Stack<String> = mutableListOf<String>(),  // ordered filenames for dictionaries
+        var kamusiList: Stack<String> = mutableListOf<String>(),  // ordered filenames for dictionaries
         var methaliList: Stack<String> = mutableListOf<String>(),  // ordered filenames for methali dicts
-        var testList:    Stack<String> = mutableListOf<String>()   // ordered filenames for test dicts
+        var testList: Stack<String> = mutableListOf<String>()   // ordered filenames for test dicts
 ) {
     init {
         // force sanity on some values

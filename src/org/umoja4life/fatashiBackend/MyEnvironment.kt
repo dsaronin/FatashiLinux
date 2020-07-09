@@ -1,4 +1,4 @@
-package Fatashi
+package org.umoja4life.fatashiBackend
 
 import java.io.File
 
@@ -21,7 +21,7 @@ object MyEnvironment {
     // **************************************************************************
 
     // myProps is read in from config_properties.json when singleton first accessed
-    val myProps = ConfigProperties.readJsonConfigurations( CONFIG_PROPERTIES_FILE )
+    val myProps = ConfigProperties.readJsonConfigurations(CONFIG_PROPERTIES_FILE)
     val anchorHead       = ANCHOR_HEAD
     val anchorTail       = ANCHOR_TAIL
     var kamusiHead:  Kamusi? = null
@@ -48,9 +48,9 @@ object MyEnvironment {
         KamusiFormat.kamusiFormatSetup(myProps.testList, testFormatList)
 
         // process the KamusiFormat files to create kamusi objects
-        kamusiHead = Kamusi.kamusiSetup( kamusiFormatList )
-        methaliHead = Kamusi.kamusiSetup( methaliFormatList )
-        testHead = Kamusi.kamusiSetup( testFormatList )
+        kamusiHead = Kamusi.kamusiSetup(kamusiFormatList)
+        methaliHead = Kamusi.kamusiSetup(methaliFormatList)
+        testHead = Kamusi.kamusiSetup(testFormatList)
     }
 
 
@@ -83,12 +83,12 @@ object MyEnvironment {
                 // flag is now the extracted flag
                 // println("extracted flag is: $flag")
                 when (flag) {
-                    "n"             -> myProps.listLineCount = popValueOrDefault(lifo,LIST_LINE_COUNT.toString())
+                    "n"             -> myProps.listLineCount = popValueOrDefault(lifo, LIST_LINE_COUNT.toString())
                     "v", "verbose"  -> myProps.verboseFlag = true
                     "d", "debug"    -> myProps.debugFlag = true
                     "p", "prod"     -> myProps.prodFlag = true
                     "h", "help"     -> printHelp()
-                    "version"       -> Version.printMyVersion( " " )
+                    "version"       -> Version.printMyVersion(" ")
 //                   "kamusi1"  -> kamusiMainFile = popFileNameOrDefault(lifo, productionFile )
 //                   "kamusi2"  -> kamusiStdFile = popFileNameOrDefault(lifo,KAMUSI_STANDARD_FILE)
 //                   "methali1" -> methaliStdFile = popFileNameOrDefault(lifo,METHALI_STANDARD_FILE)
@@ -102,7 +102,7 @@ object MyEnvironment {
 
     // printInfo -- print something informative, wrapped in Blue
     fun printInfo(s: String){
-        Fatashi.printInfo( s )
+        org.umoja4life.fatashiBackend.printInfo(s)
     }
 
     // printUsageError -- print an error, wrapped in Red
@@ -140,8 +140,8 @@ object MyEnvironment {
     private fun printHelp() {
         val argLine = "\$ ${myProps.appName} [<options>] \n  <options> ::= -v -d -n dddd --version --help \n  -v: verbose, -d: debug traces, -n: dictionary list lines <nn>"
 
-        Fatashi.printInfo("Usage and Argument line expected: ")
-        Fatashi.printInfo(argLine)
+        org.umoja4life.fatashiBackend.printInfo("Usage and Argument line expected: ")
+        org.umoja4life.fatashiBackend.printInfo(argLine)
     }
 
     // popValueOrDefault -- peeks ahead on LIFO and pops if valid value; else default
@@ -160,7 +160,7 @@ object MyEnvironment {
             // but if it doesn't match a number
             if ( ! """^\d+$""".toRegex().matches(num) ) {
                    // it was an argument format error
-                printArgUsageError( num )  // warn user
+                printArgUsageError(num)  // warn user
                 num = default   // use default
             }
         }
@@ -184,7 +184,7 @@ object MyEnvironment {
             // but if it doesn't actually match a file on the system...
             if ( ! File( str ).exists() ) {
                 // filename wasn't valid or doesn't exist
-                printArgUsageError( "filename <$str> isn't valid or doesn't exit" )  // warn user
+                printArgUsageError("filename <$str> isn't valid or doesn't exit")  // warn user
                 str = default   // use default
             }
         }

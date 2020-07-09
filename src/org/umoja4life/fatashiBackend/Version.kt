@@ -1,4 +1,4 @@
-package Fatashi
+package org.umoja4life.fatashiBackend
 
 // Version -- manages version numbering for the application
 enum class Version(val vsn: Int)  {
@@ -20,7 +20,7 @@ enum class Version(val vsn: Int)  {
 
         // printMyVersion  -- and anything else supplied
         fun printMyVersion(strsuffix: String) {
-            printInfo("\n${MyEnvironment.myProps.appName} ${Version.toVersion()} " + strsuffix )
+            printInfo("\n${MyEnvironment.myProps.appName} ${toVersion()} " + strsuffix)
         }
     }
 }

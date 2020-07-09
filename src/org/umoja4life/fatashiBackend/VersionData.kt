@@ -8,13 +8,13 @@ package Fatashi
 // The const values below are ONLY used to initialize version.kt enum Version.
 // *******************************************************************************
 // WARNING: pre-commit and post-commit git hooks reference exact path to this file
-// ********> /home/daudi/IdeaProjects/FatashiLinux/src/Fatashi/VersionData.kt <********
+// ********> /home/daudi/IdeaProjects/FatashiLinux/src/org/umoja4life/fatashiBackend/VersionData.kt <********
 // **** you must change those scripts if you change the actual file location ****
 // *******************************************************************************
 
 const val _MAJOR_VERSION=0
 const val _MINOR_VERSION=0
-const val _PATCH_VERSION=46
+const val _PATCH_VERSION=47
 const val _VERSION_COMMENT=""
-const val _GIT_VERSION_TAG="v0.0.46 "
+const val _GIT_VERSION_TAG="v0.0.47 "
 

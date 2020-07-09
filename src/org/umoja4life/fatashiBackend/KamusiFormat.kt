@@ -1,4 +1,4 @@
-package Fatashi
+package org.umoja4life.fatashiBackend
 
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -42,14 +42,14 @@ companion object {
     // kamusiFormatSetup -- recursive: works backwards on a list of KamusiFormat filenames
     // to open the file, read the JSON and return an object
     // constructs a FIFO of the results
-    fun kamusiFormatSetup(fnList: Stack<String>, fkList: Stack<KamusiFormat> ) {
+    fun kamusiFormatSetup(fnList: Stack<String>, fkList: Stack<KamusiFormat>) {
         val fn = fnList.pop() ?: return  // pop an element; unless end of list, return
 
         if( fn.isNotEmpty() )  {  // only handle nonEmpty filenames
                 // push to result list our KamusiFormat
-            fkList.push( readJsonKamusiFormats( fn ) )
+            fkList.push(readJsonKamusiFormats(fn))
         }
-        kamusiFormatSetup( fnList, fkList )  // recurse if more in list
+        kamusiFormatSetup(fnList, fkList)  // recurse if more in list
 
         // fall thru to return
     }
