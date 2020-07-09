@@ -145,11 +145,11 @@ companion object {
 
     // jumpToPage -- find the starting page of entries to match search pattern
     private fun jumpToPage( itemRegex: Regex ): Int {
-        if (MyEnvironment.myProps.verboseFlag) printInfo("Browse key: $itemRegex")
+        if (MyEnvironment.myProps.debugFlag) printInfo("Browse key: $itemRegex")
         // try this dictionary
         val index = dictionary.indexOfFirst { itemRegex.containsMatchIn(it) }
         // return whatever we've found, possibly -1: no match
-        if (MyEnvironment.myProps.verboseFlag) printInfo("Browse index: $index")
+        if (MyEnvironment.myProps.debugFlag) printInfo("Browse index: $index")
         return index
     }
 
