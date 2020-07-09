@@ -112,7 +112,13 @@ companion object {
         var endIndex = index+ MyEnvironment.myProps.listLineCount
         if (endIndex >= dictionary.count()) endIndex = dictionary.count() - 1
 
-        for (idx in (index until endIndex)) println( dictionary[idx] )
+        // for (idx in (index until endIndex)) println( dictionary[idx] )
+        // use printResults to highlight the entry item
+        printResults(
+                dictionary.slice((index until endIndex)),
+                """^([-~]?\w+[',’`]?\s?)+""".toRegex(RegexOption.IGNORE_CASE),
+                false
+        )
     }
 
     private fun advanceBrowserPage(): Int {
@@ -243,14 +249,14 @@ companion object {
     // args:
     //   res: list of dictionary entries with at least one match
     //   rex: the regex of the search key determining that match
-    fun printResults( res: List<String>, rex: Regex ){
+    fun printResults( res: List<String>, rex: Regex, divider: Boolean = true ){
         res.forEach {
             // output each line after highlighting the found text
             println( it
                     .replace(internalFields, showKeyDelim)
                     .replace(rex) { AnsiColor.wrapBlueBold(it.groupValues[0]) } )
         }
-        printDivider( "${res.size} results\n")
+        if (divider)  printDivider( "${res.size} results\n")
     }
 
      /*
